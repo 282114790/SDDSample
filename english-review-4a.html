@@ -21,6 +21,83 @@
             --card-bg: #ffffff;
         }
         
+        /* --- GAME STYLES --- */
+        .game-container {
+            background: white; border-radius: 20px; padding: 30px;
+            text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            max-width: 800px; margin: 0 auto;
+        }
+        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: #7f8c8d; }
+        .game-score { font-size: 1.5em; font-weight: bold; color: var(--secondary-color); }
+        
+        .q-display { 
+            font-size: 2.2em; font-weight: bold; color: #2c3e50; margin: 30px 0;
+            padding: 20px; background: #f9f9f9; border-radius: 15px; border: 2px dashed #ddd;
+        }
+        
+        .pv-chart { 
+            display: flex; justify-content: center; gap: 4px; margin-bottom: 30px; flex-wrap: wrap;
+        }
+        .pv-group { display: flex; gap: 4px; margin: 0 5px; padding: 5px; border-radius: 8px; background: #f0f4f8; }
+        .pv-box { display: flex; flex-direction: column; align-items: center; }
+        .pv-label { font-size: 0.8em; color: #7f8c8d; margin-bottom: 5px; }
+        .pv-input { 
+            width: 45px; height: 55px; font-size: 1.8em; text-align: center; 
+            border: 2px solid #bdc3c7; border-radius: 8px; color: #2c3e50; font-weight: bold;
+            transition: all 0.2s;
+        }
+        .pv-input:focus { border-color: var(--math-color); outline: none; transform: scale(1.1); box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2); }
+        .pv-input.correct { border-color: var(--success-color); background: #e8f8f5; color: var(--success-color); }
+        .pv-input.wrong { border-color: #e74c3c; background: #fdedec; animation: shake 0.3s; }
+        
+        .check-btn {
+            padding: 12px 40px; font-size: 1.3em; background: var(--math-color); color: white;
+            border: none; border-radius: 50px; cursor: pointer; transition: transform 0.2s;
+            box-shadow: 0 4px 0 #1e8449;
+        }
+        .check-btn:active { transform: translateY(4px); box-shadow: none; }
+        .check-btn:hover { filter: brightness(1.1); }
+
+        /* --- GAME U2: Angle Detective --- */
+        .u2-canvas-container { 
+            position: relative; width: 300px; height: 300px; margin: 0 auto 20px; 
+            background: #fff; border-radius: 50%; border: 10px solid #ecf0f1;
+            display: flex; align-items: center; justify-content: center;
+        }
+        #u2-canvas { width: 100%; height: 100%; border-radius: 50%; }
+        .u2-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .u2-btn {
+            padding: 10px 20px; border: 2px solid var(--math-color); background: white;
+            color: var(--math-color); border-radius: 30px; cursor: pointer; font-weight: bold;
+            font-size: 1.1em; transition: all 0.2s; flex: 1 1 40%;
+        }
+        .u2-btn:hover { background: var(--math-color); color: white; }
+        .u2-btn.correct { background: var(--success-color); border-color: var(--success-color); color: white; }
+        .u2-btn.wrong { background: #e74c3c; border-color: #e74c3c; color: white; }
+
+        /* --- GAME U3: Space Math --- */
+        #u3-game-area {
+            position: relative; width: 100%; height: 400px; background: #2c3e50;
+            border-radius: 15px; overflow: hidden; color: white; margin-bottom: 20px;
+        }
+        .meteor {
+            position: absolute; width: 100px; height: 100px; 
+            background: radial-gradient(circle, #95a5a6 0%, #7f8c8d 100%);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.2em; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.5);
+            transition: top 0.1s linear, transform 0.1s; z-index: 10;
+        }
+        .meteor.boom { transform: scale(1.5); opacity: 0; background: orange; }
+        .laser-beam {
+            position: absolute; width: 4px; background: #e74c3c; bottom: 0; 
+            transform-origin: bottom center; z-index: 5;
+        }
+        .u3-controls { display: flex; gap: 10px; justify-content: center; }
+        #u3-input { 
+            font-size: 1.5em; padding: 10px; width: 150px; text-align: center; 
+            border-radius: 10px; border: none; outline: 2px solid var(--math-color);
+        }
+
         body {
             font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
             background-color: var(--bg-color);
@@ -297,6 +374,9 @@
         <nav class="nav-tabs">
             <button class="nav-btn active" onclick="switchTab('math-mindmap')">🧠 知识导图</button>
             <button class="nav-btn" onclick="switchTab('math-concepts')">📐 概念与易错</button>
+            <button class="nav-btn" onclick="switchTab('math-game-u1')" style="color: #e67e22;">🎮 数字拼拼乐</button>
+            <button class="nav-btn" onclick="switchTab('math-game-u2')" style="color: #8e44ad;">🕵️‍♀️ 角度侦探</button>
+            <button class="nav-btn" onclick="switchTab('math-game-u3')" style="color: #2980b9;">🚀 太空计算</button>
             <button class="nav-btn" onclick="openFlashcardMode()" style="color: #9b59b6;">⚡ 易错判断 (翻卡)</button>
         </nav>
         <div id="math-mindmap" class="section active">
@@ -304,6 +384,71 @@
         </div>
         <div id="math-concepts" class="section">
             <div class="grid-container" id="math-list-container"></div>
+        </div>
+        
+        <!-- GAME U1 Container -->
+        <div id="math-game-u1" class="section">
+            <div class="game-container">
+                <div class="game-header">
+                    <span>第一单元：认识更大的数</span>
+                    <div class="game-score">⭐ 得分: <span id="u1-score">0</span></div>
+                </div>
+                <div class="q-display" id="u1-q-text">题目加载中...</div>
+                
+                <div class="pv-chart" id="u1-chart">
+                    <!-- Dynamic Inputs -->
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button class="check-btn" onclick="MathGameU1.check()">🚀 提交答案</button>
+                    <div id="u1-msg" style="height: 30px; margin-top: 10px; font-weight: bold;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME U2: Angle Detective -->
+        <div id="math-game-u2" class="section">
+            <div class="game-container">
+                <div class="game-header">
+                    <span>第二单元：线与角</span>
+                    <div class="game-score">⭐ 得分: <span id="u2-score">0</span></div>
+                </div>
+                <div class="u2-canvas-container">
+                    <canvas id="u2-canvas" width="300" height="300"></canvas>
+                </div>
+                <div style="text-align:center; margin-bottom:20px; color:#7f8c8d;">这是一个什么角？</div>
+                <div class="u2-options" id="u2-options">
+                    <button class="u2-btn" onclick="MathGameU2.check(this, 'acute')">锐角 (&lt;90°)</button>
+                    <button class="u2-btn" onclick="MathGameU2.check(this, 'right')">直角 (=90°)</button>
+                    <button class="u2-btn" onclick="MathGameU2.check(this, 'obtuse')">钝角 (&gt;90°)</button>
+                    <button class="u2-btn" onclick="MathGameU2.check(this, 'flat')">平角 (=180°)</button>
+                    <button class="u2-btn" onclick="MathGameU2.check(this, 'round')">周角 (=360°)</button>
+                </div>
+                <div id="u2-msg" style="height: 30px; margin-top: 15px; font-weight: bold;"></div>
+                <button class="check-btn" style="background:#8e44ad; margin-top:10px;" onclick="MathGameU2.next()">下一题 ➡️</button>
+            </div>
+        </div>
+
+        <!-- GAME U3: Space Math -->
+        <div id="math-game-u3" class="section">
+            <div class="game-container" style="max-width: 600px;">
+                <div class="game-header">
+                    <span>第三单元：乘法 (太空战)</span>
+                    <div class="game-score">🚀 击杀: <span id="u3-score">0</span></div>
+                </div>
+                <div id="u3-game-area">
+                    <div style="position:absolute; top:10px; right:10px; color:#ccc; font-size:0.8em;">按回车发射</div>
+                    <div id="u3-ship" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); font-size:3em;">🚀</div>
+                </div>
+                <div class="u3-controls">
+                    <input type="number" id="u3-input" placeholder="答案..." onkeydown="if(event.key==='Enter') MathGameU3.fire()">
+                    <button class="check-btn" style="padding:10px 20px; font-size:1em;" onclick="MathGameU3.fire()">🔥 发射</button>
+                </div>
+                <div style="margin-top:10px;">
+                    <button class="nav-btn" onclick="MathGameU3.start()">▶️ 开始游戏</button>
+                    <button class="nav-btn" onclick="MathGameU3.stop()" style="color:#e74c3c;">⏸️ 停止</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -571,10 +716,11 @@
             renderChinese();
         }
 
-        // 4. Update Mindmap
+        // 4. Update Mindmap (FIXED ID LOOKUP)
         setTimeout(() => {
             const mapIds = { english: 'mm-eng', math: 'mm-math', chinese: 'mm-chi' };
-            const svg = document.querySelector(`#${mapIds[subj]}`);
+            const svgId = mapIds[subj];
+            const svg = document.getElementById(svgId);
             
             if(svg) {
                 svg.innerHTML = '';
@@ -598,6 +744,17 @@
         document.getElementById(tabId).classList.add('active');
         
         if(tabId.includes('my-words')) renderMyWords();
+        
+        // Init Game Specifics (FIXED U1 LOADING)
+        if(tabId === 'math-game-u1') {
+             if(typeof MathGameU1 !== 'undefined') MathGameU1.init();
+        }
+        if(tabId === 'math-game-u2') MathGameU2.init();
+        if(tabId === 'math-game-u3') {
+            document.getElementById('u3-score').innerText = 0;
+        } else {
+            MathGameU3.stop(); // Stop loop if leaving tab
+        }
     }
 
     // --- RENDERERS ---
@@ -904,6 +1061,348 @@
             confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 }, scalar: 2.0 });
         }
     }
+
+    // --- MATH GAME U1 LOGIC ---
+    const MathGameU1 = {
+        data: [
+            { t: "二千零五万零三十", v: "20050030" },
+            { t: "三亿零八十万", v: "300800000" },
+            { t: "四千五百万", v: "45000000" },
+            { t: "一亿两千万", v: "120000000" },
+            { t: "五十万零五", v: "500005" },
+            { t: "七千零一万", v: "70010000" },
+            { t: "九亿零九", v: "900000009" }
+        ],
+        idx: 0,
+        score: 0,
+        
+        init: () => {
+            MathGameU1.idx = 0;
+            MathGameU1.score = 0;
+            MathGameU1.render();
+        },
+        
+        render: () => {
+            const q = MathGameU1.data[MathGameU1.idx];
+            document.getElementById('u1-score').innerText = MathGameU1.score;
+            document.getElementById('u1-q-text').innerText = q.t;
+            document.getElementById('u1-msg').innerText = "";
+            
+            // Build Inputs based on length (Groups of 4)
+            const len = q.v.length;
+            const chart = document.getElementById('u1-chart');
+            chart.innerHTML = '';
+            
+            // Labels for levels
+            const labels = ["个", "十", "百", "千", "万", "十万", "百万", "千万", "亿", "十亿", "百亿"];
+            
+            let html = '';
+            // Process from high to low
+            let groupHTML = '<div class="pv-group">';
+            
+            for(let i=len-1; i>=0; i--) {
+                // If crossing group boundary (4 digits), close and start new group
+                if(i !== len-1 && (i+1)%4 === 0) {
+                    groupHTML += '</div><div class="pv-group">';
+                }
+                
+                groupHTML += `
+                    <div class="pv-box">
+                        <span class="pv-label">${labels[i]}</span>
+                        <input type="tel" maxlength="1" class="pv-input" id="u1-in-${i}" oninput="MathGameU1.focusNext(this, ${i})">
+                    </div>
+                `;
+            }
+            groupHTML += '</div>';
+            chart.innerHTML = groupHTML;
+            
+            // Focus first
+            setTimeout(() => {
+                const el = document.getElementById(`u1-in-${len-1}`);
+                if(el) el.focus();
+            }, 100);
+        },
+        
+        focusNext: (el, idx) => {
+            if(el.value.length === 1 && idx > 0) {
+                document.getElementById(`u1-in-${idx-1}`).focus();
+            }
+        },
+        
+        check: () => {
+            const q = MathGameU1.data[MathGameU1.idx];
+            let userVal = "";
+            let correct = true;
+            
+            for(let i=q.v.length-1; i>=0; i--) {
+                const input = document.getElementById(`u1-in-${i}`);
+                const val = input.value;
+                userVal += val;
+                
+                if(val === q.v[q.v.length - 1 - i]) {
+                    input.classList.add('correct');
+                    input.classList.remove('wrong');
+                } else {
+                    input.classList.add('wrong');
+                    correct = false;
+                }
+            }
+            
+            const msg = document.getElementById('u1-msg');
+            if(correct) {
+                MathGameU1.score += 10;
+                document.getElementById('u1-score').innerText = MathGameU1.score;
+                msg.innerHTML = "<span style='color:green'>🎉 太棒了！答对了！</span>";
+                fireConfetti('full');
+                setTimeout(() => {
+                    MathGameU1.idx = (MathGameU1.idx + 1) % MathGameU1.data.length;
+                    MathGameU1.render();
+                }, 2000);
+            } else {
+                msg.innerHTML = "<span style='color:red'>❌ 再试一次哦！</span>";
+            }
+        }
+    };
+
+    // --- MATH GAME U2: Angle Detective ---
+    const MathGameU2 = {
+        score: 0,
+        currentType: '',
+        ctx: null,
+        
+        init: () => {
+            MathGameU2.score = 0;
+            const canvas = document.getElementById('u2-canvas');
+            MathGameU2.ctx = canvas.getContext('2d');
+            MathGameU2.next();
+        },
+        
+        next: () => {
+            document.getElementById('u2-msg').innerHTML = '';
+            document.querySelectorAll('.u2-btn').forEach(b => {
+                b.classList.remove('correct', 'wrong');
+                b.disabled = false;
+            });
+            document.getElementById('u2-score').innerText = MathGameU2.score;
+            MathGameU2.drawRandomAngle();
+        },
+        
+        drawRandomAngle: () => {
+            const ctx = MathGameU2.ctx;
+            ctx.clearRect(0,0,300,300);
+            const types = ['acute', 'right', 'obtuse', 'flat', 'round'];
+            // Weights: acute(30%), right(20%), obtuse(30%), flat(10%), round(10%)
+            const r = Math.random();
+            let type = 'acute';
+            if(r>0.3) type='right';
+            if(r>0.5) type='obtuse';
+            if(r>0.8) type='flat';
+            if(r>0.9) type='round';
+            MathGameU2.currentType = type;
+            
+            let angle = 0;
+            switch(type) {
+                case 'acute': angle = Math.floor(Math.random()*80)+5; break; // 5-85
+                case 'right': angle = 90; break;
+                case 'obtuse': angle = Math.floor(Math.random()*80)+95; break; // 95-175
+                case 'flat': angle = 180; break;
+                case 'round': angle = 360; break;
+            }
+            
+            // Draw
+            const cx=150, cy=150, radius=100;
+            const startRad = Math.random() * Math.PI * 2; // Random rotation
+            const endRad = startRad - (angle * Math.PI / 180); // Counter-clockwise
+            
+            ctx.beginPath();
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#2c3e50';
+            
+            // Line 1
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.cos(startRad)*radius, cy + Math.sin(startRad)*radius);
+            
+            // Line 2
+            if(type !== 'round') {
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(cx + Math.cos(endRad)*radius, cy + Math.sin(endRad)*radius);
+            } else {
+                // For round angle, draw a slightly offset line or just one line with full arc
+                // Ideally visual representation of round angle is a ray with a full circle arc
+            }
+            ctx.stroke();
+            
+            // Draw Arc
+            ctx.beginPath();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#e74c3c';
+            if(type === 'right') {
+                // Draw square symbol? Simplified to arc for now or implement later
+                ctx.arc(cx, cy, 30, endRad, startRad); 
+            } else {
+                ctx.arc(cx, cy, 30, endRad, startRad);
+            }
+            ctx.stroke();
+            
+            // Text for debug? No, keep it visual.
+        },
+        
+        check: (btn, type) => {
+            if(btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+            
+            if(type === MathGameU2.currentType) {
+                btn.classList.add('correct');
+                document.getElementById('u2-msg').innerHTML = "<span style='color:green'>🎉 正确！</span>";
+                MathGameU2.score += 10;
+                document.getElementById('u2-score').innerText = MathGameU2.score;
+                fireConfetti('mini');
+                setTimeout(MathGameU2.next, 1000);
+            } else {
+                btn.classList.add('wrong');
+                document.getElementById('u2-msg').innerHTML = "<span style='color:red'>❌ 错了，再看看！</span>";
+            }
+        }
+    };
+
+    // --- MATH GAME U3: Space Math ---
+    const MathGameU3 = {
+        active: false,
+        score: 0,
+        meteors: [],
+        spawnTimer: null,
+        gameLoop: null,
+        
+        start: () => {
+            if(MathGameU3.active) return;
+            MathGameU3.active = true;
+            MathGameU3.score = 0;
+            MathGameU3.meteors = [];
+            document.getElementById('u3-score').innerText = 0;
+            document.getElementById('u3-input').value = '';
+            document.getElementById('u3-input').focus();
+            
+            // Clean area
+            document.querySelectorAll('.meteor, .laser-beam').forEach(e => e.remove());
+            
+            MathGameU3.spawnTimer = setInterval(MathGameU3.spawnMeteor, 2500); // Every 2.5s
+            MathGameU3.gameLoop = requestAnimationFrame(MathGameU3.loop);
+        },
+        
+        stop: () => {
+            MathGameU3.active = false;
+            clearInterval(MathGameU3.spawnTimer);
+            cancelAnimationFrame(MathGameU3.gameLoop);
+        },
+        
+        spawnMeteor: () => {
+            const area = document.getElementById('u3-game-area');
+            const m = document.createElement('div');
+            m.className = 'meteor';
+            m.style.left = Math.random() * (area.clientWidth - 100) + 'px';
+            m.style.top = '-100px';
+            
+            // Generate Question (3-digit * 2-digit estimation or simple math)
+            // Focus on mental math: e.g., 25*4, 125*8, 40*50, 300/5
+            const types = ['mul_simple', 'mul_est', 'div_simple'];
+            const t = types[Math.floor(Math.random()*types.length)];
+            let qText = '', ans = 0;
+            
+            if(t === 'mul_simple') { // 25*4, 15*6
+                const a = [25, 125, 15, 12, 11, 20, 50][Math.floor(Math.random()*7)];
+                const b = [2, 4, 8, 3, 5, 6, 9][Math.floor(Math.random()*7)];
+                qText = `${a} × ${b}`;
+                ans = a * b;
+            } else if (t === 'mul_est') { // 40*60
+                const a = Math.floor(Math.random()*9+1)*10; // 10-90
+                const b = Math.floor(Math.random()*9+1)*100; // 100-900
+                qText = `${b} × ${a}`;
+                ans = a * b;
+            } else { // 400 / 20
+                const b = Math.floor(Math.random()*9+1)*10;
+                const res = Math.floor(Math.random()*9+1)*10;
+                const a = b * res;
+                qText = `${a} ÷ ${b}`;
+                ans = res;
+            }
+            
+            m.innerText = qText;
+            m.dataset.ans = ans;
+            area.appendChild(m);
+            MathGameU3.meteors.push({ el: m, speed: Math.random()*0.5 + 0.5 });
+        },
+        
+        loop: () => {
+            if(!MathGameU3.active) return;
+            
+            const areaHeight = document.getElementById('u3-game-area').clientHeight;
+            
+            MathGameU3.meteors.forEach((mObj, idx) => {
+                const currentTop = parseFloat(mObj.el.style.top);
+                if(currentTop > areaHeight) {
+                    mObj.el.remove();
+                    MathGameU3.meteors.splice(idx, 1);
+                    // Game Over logic could go here
+                } else {
+                    mObj.el.style.top = (currentTop + mObj.speed) + 'px';
+                }
+            });
+            
+            MathGameU3.gameLoop = requestAnimationFrame(MathGameU3.loop);
+        },
+        
+        fire: () => {
+            const input = document.getElementById('u3-input');
+            const val = parseInt(input.value);
+            if(isNaN(val)) return;
+            
+            // Find meteor
+            const hitIdx = MathGameU3.meteors.findIndex(m => parseInt(m.el.dataset.ans) === val);
+            
+            if(hitIdx !== -1) {
+                // HIT!
+                const mObj = MathGameU3.meteors[hitIdx];
+                MathGameU3.createLaser(mObj.el);
+                mObj.el.classList.add('boom');
+                setTimeout(() => mObj.el.remove(), 200);
+                MathGameU3.meteors.splice(hitIdx, 1);
+                
+                MathGameU3.score += 10;
+                document.getElementById('u3-score').innerText = MathGameU3.score;
+                input.value = '';
+                fireConfetti('mini');
+            } else {
+                // Miss
+                input.style.borderColor = 'red';
+                setTimeout(()=>input.style.borderColor = 'var(--math-color)', 200);
+            }
+        },
+        
+        createLaser: (targetEl) => {
+            const area = document.getElementById('u3-game-area');
+            const laser = document.createElement('div');
+            laser.className = 'laser-beam';
+            
+            const shipX = area.clientWidth / 2;
+            const targetRect = targetEl.getBoundingClientRect();
+            const areaRect = area.getBoundingClientRect();
+            
+            const targetX = targetRect.left - areaRect.left + targetRect.width/2;
+            const targetY = targetRect.top - areaRect.top + targetRect.height/2;
+            
+            const deltaX = targetX - shipX;
+            const deltaY = targetY - area.clientHeight; // ship is at bottom
+            const dist = Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+            const angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI + 90; // adjust for vertical origin
+            
+            laser.style.height = dist + 'px';
+            laser.style.left = shipX + 'px';
+            laser.style.transform = `rotate(${angle}deg)`;
+            
+            area.appendChild(laser);
+            setTimeout(() => laser.remove(), 100);
+        }
+    };
 
 </script>
 </body>
