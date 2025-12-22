@@ -75,28 +75,82 @@
         .u2-btn.correct { background: var(--success-color); border-color: var(--success-color); color: white; }
         .u2-btn.wrong { background: #e74c3c; border-color: #e74c3c; color: white; }
 
-        /* --- GAME U3: Space Math --- */
+        /* --- GAME U3: Space Math (Revised) --- */
         #u3-game-area {
-            position: relative; width: 100%; height: 400px; background: #2c3e50;
+            position: relative; width: 100%; height: 350px; background: #2c3e50;
             border-radius: 15px; overflow: hidden; color: white; margin-bottom: 20px;
         }
         .meteor {
-            position: absolute; width: 100px; height: 100px; 
-            background: radial-gradient(circle, #95a5a6 0%, #7f8c8d 100%);
+            position: absolute; width: 120px; height: 120px; 
+            background: radial-gradient(circle, #e67e22 0%, #d35400 100%);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 1.2em; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.5);
-            transition: top 0.1s linear, transform 0.1s; z-index: 10;
+            font-weight: bold; font-size: 1.5em; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.5);
+            transition: top 0.05s linear; z-index: 10;
         }
-        .meteor.boom { transform: scale(1.5); opacity: 0; background: orange; }
+        .meteor.boom { transform: scale(1.5); opacity: 0; background: #f1c40f; transition: all 0.2s; }
         .laser-beam {
-            position: absolute; width: 4px; background: #e74c3c; bottom: 0; 
-            transform-origin: bottom center; z-index: 5;
+            position: absolute; width: 6px; background: #e74c3c; bottom: 0; 
+            transform-origin: bottom center; z-index: 5; box-shadow: 0 0 10px #e74c3c;
         }
-        .u3-controls { display: flex; gap: 10px; justify-content: center; }
-        #u3-input { 
-            font-size: 1.5em; padding: 10px; width: 150px; text-align: center; 
-            border-radius: 10px; border: none; outline: 2px solid var(--math-color);
+        .u3-controls { display: flex; gap: 10px; justify-content: center; padding: 0 10px; }
+        .u3-opt-btn {
+            flex: 1; height: 70px; font-size: 1.8em; font-weight: bold;
+            border: none; border-radius: 12px; cursor: pointer;
+            background: #3498db; color: white; box-shadow: 0 5px 0 #2980b9;
+            transition: all 0.1s;
         }
+        .u3-opt-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #2980b9; }
+        .u3-opt-btn.wrong { background: #7f8c8d; box-shadow: 0 5px 0 #95a5a6; animation: shake 0.3s; }
+
+
+        /* --- GAME U4: Law Match --- */
+        .u4-container { display: flex; justify-content: space-between; gap: 20px; margin: 20px 0; }
+        .u4-col { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .u4-item {
+            padding: 15px; background: white; border: 2px solid #ddd; border-radius: 10px;
+            cursor: pointer; text-align: center; font-weight: bold; transition: all 0.2s;
+        }
+        .u4-item:hover { border-color: var(--math-color); background: #f0fdf4; }
+        .u4-item.selected { border-color: var(--secondary-color); background: #fef9e7; box-shadow: 0 0 10px rgba(245, 166, 35, 0.3); }
+        .u4-item.matched { opacity: 0; pointer-events: none; transform: scale(0.8); }
+
+        /* --- GAME U5: Coordinate Hunt --- */
+        .u5-grid { 
+            display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; 
+            margin: 20px auto; max-width: 400px; background: #ecf0f1; padding: 5px; border-radius: 5px;
+        }
+        .u5-cell {
+            aspect-ratio: 1; background: white; border-radius: 4px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2em;
+            transition: transform 0.1s;
+        }
+        .u5-cell:hover { background: #e8f8f5; transform: scale(1.1); z-index: 2; }
+        .u5-cell.header { background: transparent; color: #7f8c8d; font-weight: bold; cursor: default; }
+        .u5-cell.treasure { background: #f1c40f; animation: pop 0.3s; }
+        .u5-cell.miss { background: #bdc3c7; }
+
+        /* --- GAME U7: Thermometer --- */
+        .u7-container { display: flex; align-items: center; justify-content: center; gap: 40px; height: 400px; }
+        .thermometer-wrapper { position: relative; width: 100px; height: 350px; cursor: crosshair; }
+        #u7-canvas { width: 100%; height: 100%; }
+        .u7-slider { 
+            position: absolute; left: 45px; 
+            width: 55px; height: 26px; 
+            background: #e74c3c; color: white;
+            border-radius: 4px; pointer-events: none; 
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: top 0.05s linear; /* 更流畅的跟随 */
+            z-index: 10;
+        }
+        /* 左侧小箭头 */
+        .u7-slider::before {
+            content: ''; position: absolute; left: -6px; top: 8px;
+            border-right: 6px solid #e74c3c; border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+        }
+
+        @keyframes pop { 0% {transform: scale(0);} 80% {transform: scale(1.2);} 100% {transform: scale(1);} }
 
         body {
             font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
@@ -239,6 +293,88 @@
             padding-bottom: 10px; display: flex; align-items: center; gap: 10px;
         }
 
+        /* --- Magic Concept Cards (Math) --- */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+        .concept-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .concept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: var(--math-color);
+        }
+        .concept-card.checked {
+            background: #f0fdf4;
+            border-color: #2ecc71;
+        }
+        .cc-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        .cc-icon {
+            font-size: 2em;
+            background: #ecf0f1;
+            width: 50px; height: 50px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+        }
+        .cc-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+        .cc-desc {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        /* "Mastered" Stamp Effect */
+        .concept-card.checked::after {
+            content: '已掌握';
+            position: absolute;
+            right: -10px;
+            bottom: 10px;
+            font-size: 1.5rem;
+            color: rgba(39, 174, 96, 0.3);
+            border: 4px solid rgba(39, 174, 96, 0.3);
+            border-radius: 10px;
+            padding: 5px 10px;
+            transform: rotate(-20deg) scale(1.5);
+            font-weight: 900;
+            pointer-events: none;
+            opacity: 0;
+            animation: stamp-in 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes stamp-in {
+            to { opacity: 1; transform: rotate(-20deg) scale(1); }
+        }
+        
+        /* Checkbox hidden but functional */
+        .concept-card input[type="checkbox"] {
+            position: absolute; top: 15px; right: 15px;
+            transform: scale(1.5); accent-color: var(--math-color);
+            cursor: pointer;
+            z-index: 2;
+        }
+
         /* Check Items */
         .check-item {
             display: flex; align-items: center; margin-bottom: 12px;
@@ -377,6 +513,9 @@
             <button class="nav-btn" onclick="switchTab('math-game-u1')" style="color: #e67e22;">🎮 数字拼拼乐</button>
             <button class="nav-btn" onclick="switchTab('math-game-u2')" style="color: #8e44ad;">🕵️‍♀️ 角度侦探</button>
             <button class="nav-btn" onclick="switchTab('math-game-u3')" style="color: #2980b9;">🚀 太空计算</button>
+            <button class="nav-btn" onclick="switchTab('math-game-u4')" style="color: #16a085;">🔗 运算律</button>
+            <button class="nav-btn" onclick="switchTab('math-game-u5')" style="color: #d35400;">🏴‍☠️ 数对寻宝</button>
+            <button class="nav-btn" onclick="switchTab('math-game-u7')" style="color: #2c3e50;">🌡️ 温度升降</button>
             <button class="nav-btn" onclick="openFlashcardMode()" style="color: #9b59b6;">⚡ 易错判断 (翻卡)</button>
         </nav>
         <div id="math-mindmap" class="section active">
@@ -437,17 +576,66 @@
                     <div class="game-score">🚀 击杀: <span id="u3-score">0</span></div>
                 </div>
                 <div id="u3-game-area">
-                    <div style="position:absolute; top:10px; right:10px; color:#ccc; font-size:0.8em;">按回车发射</div>
-                    <div id="u3-ship" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); font-size:3em;">🚀</div>
+                    <div style="position:absolute; top:10px; right:10px; color:#bdc3c7; font-size:0.8em;">点击下方答案发射激光</div>
+                    <div id="u3-ship" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); font-size:4em; z-index:20;">🚀</div>
                 </div>
-                <div class="u3-controls">
-                    <input type="number" id="u3-input" placeholder="答案..." onkeydown="if(event.key==='Enter') MathGameU3.fire()">
-                    <button class="check-btn" style="padding:10px 20px; font-size:1em;" onclick="MathGameU3.fire()">🔥 发射</button>
+                <div class="u3-controls" id="u3-options-container">
+                    <!-- Buttons generated by JS -->
                 </div>
-                <div style="margin-top:10px;">
+                <div style="margin-top:15px; display:flex; justify-content:center; gap:20px;">
                     <button class="nav-btn" onclick="MathGameU3.start()">▶️ 开始游戏</button>
                     <button class="nav-btn" onclick="MathGameU3.stop()" style="color:#e74c3c;">⏸️ 停止</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- GAME U4: Law Match -->
+        <div id="math-game-u4" class="section">
+            <div class="game-container">
+                <div class="game-header">
+                    <span>第四单元：运算律</span>
+                    <div class="game-score">⭐ 剩余: <span id="u4-left">0</span> 对</div>
+                </div>
+                <div class="u4-container">
+                    <div class="u4-col" id="u4-col-left"></div>
+                    <div class="u4-col" id="u4-col-right"></div>
+                </div>
+                <div id="u4-msg" style="height:30px; font-weight:bold;"></div>
+                <button class="check-btn" style="background:#16a085; margin-top:10px;" onclick="MathGameU4.init()">🔄 重新开始</button>
+            </div>
+        </div>
+
+        <!-- GAME U5: Coordinate Hunt -->
+        <div id="math-game-u5" class="section">
+            <div class="game-container">
+                <div class="game-header">
+                    <span>第五单元：方向与位置</span>
+                    <div class="game-score">🏴‍☠️ 宝藏: <span id="u5-score">0</span></div>
+                </div>
+                <div class="q-display" id="u5-q-text" style="font-size:1.5em; padding:10px;">目标：(3, 5)</div>
+                <div class="u5-grid" id="u5-grid"></div>
+                <div id="u5-msg" style="height:30px; font-weight:bold;"></div>
+            </div>
+        </div>
+
+        <!-- GAME U7: Thermometer -->
+        <div id="math-game-u7" class="section">
+            <div class="game-container">
+                <div class="game-header">
+                    <span>第七单元：生活中的负数</span>
+                    <div class="game-score">🌡️ 答对: <span id="u7-score">0</span></div>
+                </div>
+                <div class="u7-container">
+                    <div style="flex:1; text-align:left;">
+                        <div class="q-display" id="u7-q-text" style="font-size:1.4em;">现在 5℃，气温下降 8℃</div>
+                        <div style="margin-top:20px; color:#7f8c8d;">请点击右侧温度计对应的刻度</div>
+                    </div>
+                    <div class="thermometer-wrapper">
+                        <canvas id="u7-canvas" width="60" height="350"></canvas>
+                        <div class="u7-slider" id="u7-slider" style="top:50%;"></div>
+                    </div>
+                </div>
+                <div id="u7-msg" style="height:30px; font-weight:bold; margin-top:20px;"></div>
             </div>
         </div>
     </div>
@@ -750,6 +938,10 @@
              if(typeof MathGameU1 !== 'undefined') MathGameU1.init();
         }
         if(tabId === 'math-game-u2') MathGameU2.init();
+        if(tabId === 'math-game-u4') MathGameU4.init();
+        if(tabId === 'math-game-u5') MathGameU5.init();
+        if(tabId === 'math-game-u7') MathGameU7.init();
+
         if(tabId === 'math-game-u3') {
             document.getElementById('u3-score').innerText = 0;
         } else {
@@ -824,12 +1016,63 @@
     function renderMath() {
         const c = document.getElementById('math-list-container');
         if(c.innerHTML) return; // Render once
-        const card = document.createElement('div'); card.className = 'card';
-        card.innerHTML = '<h3>核心概念 (必背)</h3>';
+        
+        // Use Grid Layout for Magic Cards
+        c.className = 'concept-grid';
+        
         DB.math.concepts.forEach(item => {
-            card.innerHTML += `<div class="check-item"><input type="checkbox"><span><strong>${item.k}</strong>: ${item.v}</span></div>`;
+            // Icon Mapping
+            let icon = '📝';
+            const k = item.k || ""; 
+            if(k.includes('数对')) icon = '📍';
+            else if(k.includes('负数')) icon = '🌡️';
+            else if(k.includes('数')) icon = '🔢'; // Default for numbers
+            else if(k.includes('线')) icon = '📏';
+            else if(k.includes('角')) icon = '📐';
+            else if(k.includes('律')) icon = '✖️';
+            else if(k.includes('商')) icon = '➗';
+            
+            // Create Card
+            const card = document.createElement('div');
+            card.className = 'concept-card';
+            
+            // Random Macaron Background
+            const bgColors = [
+                '#ffefef', // Light Red
+                '#fff7e6', // Light Orange
+                '#f0f9ff', // Light Blue
+                '#f6ffed', // Light Green
+                '#fff0f6', // Light Pink
+                '#f9f0ff', // Light Purple
+                '#e6fffb', // Cyan
+                '#fcffe6'  // Lime
+            ];
+            card.style.backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+            
+            // Interaction: Toggle check
+            card.onclick = (e) => {
+                if(e.target.type === 'checkbox') return; // Let checkbox handle itself
+                const box = card.querySelector('input[type="checkbox"]');
+                box.checked = !box.checked;
+                // Trigger change event manually for progress bar
+                const event = new Event('change');
+                box.dispatchEvent(event);
+                card.classList.toggle('checked', box.checked);
+                if(box.checked) playSuccessSound('mini'); 
+            };
+            
+            const html = `
+                <input type="checkbox" onchange="this.parentElement.classList.toggle('checked', this.checked)">
+                <div class="cc-header">
+                    <div class="cc-icon">${icon}</div>
+                    <div class="cc-title">${item.k}</div>
+                </div>
+                <div class="cc-desc">${item.v}</div>
+            `;
+            
+            card.innerHTML = html;
+            c.appendChild(card);
         });
-        c.appendChild(card);
     }
 
     // Chinese
@@ -1173,6 +1416,7 @@
         init: () => {
             MathGameU2.score = 0;
             const canvas = document.getElementById('u2-canvas');
+            if(!canvas) return;
             MathGameU2.ctx = canvas.getContext('2d');
             MathGameU2.next();
         },
@@ -1189,9 +1433,11 @@
         
         drawRandomAngle: () => {
             const ctx = MathGameU2.ctx;
-            ctx.clearRect(0,0,300,300);
+            const w = ctx.canvas.width;
+            const h = ctx.canvas.height;
+            ctx.clearRect(0,0,w,h);
+            
             const types = ['acute', 'right', 'obtuse', 'flat', 'round'];
-            // Weights: acute(30%), right(20%), obtuse(30%), flat(10%), round(10%)
             const r = Math.random();
             let type = 'acute';
             if(r>0.3) type='right';
@@ -1209,10 +1455,9 @@
                 case 'round': angle = 360; break;
             }
             
-            // Draw
-            const cx=150, cy=150, radius=100;
-            const startRad = Math.random() * Math.PI * 2; // Random rotation
-            const endRad = startRad - (angle * Math.PI / 180); // Counter-clockwise
+            const cx=w/2, cy=h/2, radius=w*0.35;
+            const startRad = Math.random() * Math.PI * 2; 
+            const endRad = startRad - (angle * Math.PI / 180); 
             
             ctx.beginPath();
             ctx.lineWidth = 5;
@@ -1227,25 +1472,21 @@
             if(type !== 'round') {
                 ctx.moveTo(cx, cy);
                 ctx.lineTo(cx + Math.cos(endRad)*radius, cy + Math.sin(endRad)*radius);
-            } else {
-                // For round angle, draw a slightly offset line or just one line with full arc
-                // Ideally visual representation of round angle is a ray with a full circle arc
             }
             ctx.stroke();
             
             // Draw Arc
             ctx.beginPath();
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.strokeStyle = '#e74c3c';
             if(type === 'right') {
-                // Draw square symbol? Simplified to arc for now or implement later
+                // Approximate square symbol
+                // Simple arc is fine for now, or could draw lines
                 ctx.arc(cx, cy, 30, endRad, startRad); 
             } else {
                 ctx.arc(cx, cy, 30, endRad, startRad);
             }
             ctx.stroke();
-            
-            // Text for debug? No, keep it visual.
         },
         
         check: (btn, type) => {
@@ -1265,58 +1506,63 @@
         }
     };
 
-    // --- MATH GAME U3: Space Math ---
+    // --- MATH GAME U3: Space Math (Revised: Quick Fire) ---
     const MathGameU3 = {
         active: false,
         score: 0,
-        meteors: [],
-        spawnTimer: null,
-        gameLoop: null,
+        currentMeteor: null, // Only one at a time
+        gameLoopId: null,
+        spawnId: null,
+        speed: 1.0,
         
         start: () => {
             if(MathGameU3.active) return;
             MathGameU3.active = true;
             MathGameU3.score = 0;
-            MathGameU3.meteors = [];
+            MathGameU3.speed = 0.5; // Initial speed halved (was 1.0)
             document.getElementById('u3-score').innerText = 0;
-            document.getElementById('u3-input').value = '';
-            document.getElementById('u3-input').focus();
             
             // Clean area
             document.querySelectorAll('.meteor, .laser-beam').forEach(e => e.remove());
+            MathGameU3.currentMeteor = null;
             
-            MathGameU3.spawnTimer = setInterval(MathGameU3.spawnMeteor, 2500); // Every 2.5s
-            MathGameU3.gameLoop = requestAnimationFrame(MathGameU3.loop);
+            // Start Loop
+            MathGameU3.spawnMeteor();
+            MathGameU3.loop();
         },
         
         stop: () => {
             MathGameU3.active = false;
-            clearInterval(MathGameU3.spawnTimer);
-            cancelAnimationFrame(MathGameU3.gameLoop);
+            cancelAnimationFrame(MathGameU3.gameLoopId);
+            clearTimeout(MathGameU3.spawnId);
         },
         
         spawnMeteor: () => {
+            if(!MathGameU3.active) return;
+            
             const area = document.getElementById('u3-game-area');
             const m = document.createElement('div');
             m.className = 'meteor';
-            m.style.left = Math.random() * (area.clientWidth - 100) + 'px';
-            m.style.top = '-100px';
             
-            // Generate Question (3-digit * 2-digit estimation or simple math)
-            // Focus on mental math: e.g., 25*4, 125*8, 40*50, 300/5
+            // Random X position (padding 20px)
+            const maxX = area.clientWidth - 120;
+            m.style.left = (Math.random() * maxX) + 'px';
+            m.style.top = '-120px'; // Start above screen
+            
+            // Question Logic
             const types = ['mul_simple', 'mul_est', 'div_simple'];
             const t = types[Math.floor(Math.random()*types.length)];
             let qText = '', ans = 0;
             
-            if(t === 'mul_simple') { // 25*4, 15*6
-                const a = [25, 125, 15, 12, 11, 20, 50][Math.floor(Math.random()*7)];
-                const b = [2, 4, 8, 3, 5, 6, 9][Math.floor(Math.random()*7)];
+            if(t === 'mul_simple') { // 25x4, 125x8
+                const a = [25, 125, 15, 12, 11, 20, 50, 14, 16][Math.floor(Math.random()*9)];
+                const b = [2, 3, 4, 5, 6, 8, 9][Math.floor(Math.random()*7)];
                 qText = `${a} × ${b}`;
                 ans = a * b;
-            } else if (t === 'mul_est') { // 40*60
-                const a = Math.floor(Math.random()*9+1)*10; // 10-90
-                const b = Math.floor(Math.random()*9+1)*100; // 100-900
-                qText = `${b} × ${a}`;
+            } else if (t === 'mul_est') { // 40x60
+                const a = Math.floor(Math.random()*9+1)*10; 
+                const b = Math.floor(Math.random()*9+1)*10;
+                qText = `${a} × ${b}`;
                 ans = a * b;
             } else { // 400 / 20
                 const b = Math.floor(Math.random()*9+1)*10;
@@ -1329,52 +1575,93 @@
             m.innerText = qText;
             m.dataset.ans = ans;
             area.appendChild(m);
-            MathGameU3.meteors.push({ el: m, speed: Math.random()*0.5 + 0.5 });
+            
+            MathGameU3.currentMeteor = { el: m, speed: MathGameU3.speed, ans: ans };
+            MathGameU3.speed += 0.02; // Slower acceleration (was 0.05)
+            
+            // Generate Options
+            MathGameU3.generateOptions(ans);
+        },
+        
+        generateOptions: (correct) => {
+            const container = document.getElementById('u3-options-container');
+            container.innerHTML = '';
+            
+            // Generate wrong answers (distractors)
+            let opts = new Set([correct]);
+            while(opts.size < 3) {
+                // Distractor logic: +/- 10, +/- 100, or random tail
+                const offset = (Math.random() > 0.5 ? 1 : -1) * [10, 20, 50, 100, 5][Math.floor(Math.random()*5)];
+                let val = correct + offset;
+                if(val > 0) opts.add(val);
+            }
+            
+            // Shuffle
+            const arr = Array.from(opts).sort(() => Math.random() - 0.5);
+            
+            arr.forEach(val => {
+                const btn = document.createElement('button');
+                btn.className = 'u3-opt-btn';
+                btn.innerText = val;
+                btn.onclick = () => MathGameU3.check(btn, val);
+                container.appendChild(btn);
+            });
         },
         
         loop: () => {
             if(!MathGameU3.active) return;
             
             const areaHeight = document.getElementById('u3-game-area').clientHeight;
+            const mObj = MathGameU3.currentMeteor;
             
-            MathGameU3.meteors.forEach((mObj, idx) => {
+            if(mObj) {
                 const currentTop = parseFloat(mObj.el.style.top);
-                if(currentTop > areaHeight) {
-                    mObj.el.remove();
-                    MathGameU3.meteors.splice(idx, 1);
-                    // Game Over logic could go here
+                if(currentTop > areaHeight - 80) { // Hit bottom (ship)
+                    // Game Over or Just Boom? Let's just Boom and reset for endless fun
+                    mObj.el.classList.add('boom');
+                    setTimeout(() => mObj.el.remove(), 200);
+                    MathGameU3.currentMeteor = null;
+                    MathGameU3.score = Math.max(0, MathGameU3.score - 5);
+                    document.getElementById('u3-score').innerText = MathGameU3.score;
+                    // Respawn
+                    setTimeout(MathGameU3.spawnMeteor, 500);
                 } else {
                     mObj.el.style.top = (currentTop + mObj.speed) + 'px';
                 }
-            });
+            }
             
-            MathGameU3.gameLoop = requestAnimationFrame(MathGameU3.loop);
+            MathGameU3.gameLoopId = requestAnimationFrame(MathGameU3.loop);
         },
         
-        fire: () => {
-            const input = document.getElementById('u3-input');
-            const val = parseInt(input.value);
-            if(isNaN(val)) return;
+        check: (btn, val) => {
+            if(!MathGameU3.currentMeteor) return;
             
-            // Find meteor
-            const hitIdx = MathGameU3.meteors.findIndex(m => parseInt(m.el.dataset.ans) === val);
+            const correct = MathGameU3.currentMeteor.ans;
             
-            if(hitIdx !== -1) {
+            if(val === correct) {
                 // HIT!
-                const mObj = MathGameU3.meteors[hitIdx];
-                MathGameU3.createLaser(mObj.el);
-                mObj.el.classList.add('boom');
-                setTimeout(() => mObj.el.remove(), 200);
-                MathGameU3.meteors.splice(hitIdx, 1);
+                MathGameU3.createLaser(MathGameU3.currentMeteor.el);
+                MathGameU3.currentMeteor.el.classList.add('boom');
                 
+                const elToRemove = MathGameU3.currentMeteor.el;
+                setTimeout(() => elToRemove.remove(), 200);
+                
+                MathGameU3.currentMeteor = null;
                 MathGameU3.score += 10;
                 document.getElementById('u3-score').innerText = MathGameU3.score;
-                input.value = '';
                 fireConfetti('mini');
+                
+                // Clear buttons to prevent double click
+                document.getElementById('u3-options-container').innerHTML = '';
+                
+                // Next
+                setTimeout(MathGameU3.spawnMeteor, 500);
             } else {
                 // Miss
-                input.style.borderColor = 'red';
-                setTimeout(()=>input.style.borderColor = 'var(--math-color)', 200);
+                btn.classList.add('wrong');
+                setTimeout(() => btn.classList.remove('wrong'), 300);
+                MathGameU3.score = Math.max(0, MathGameU3.score - 2);
+                document.getElementById('u3-score').innerText = MathGameU3.score;
             }
         },
         
@@ -1401,6 +1688,277 @@
             
             area.appendChild(laser);
             setTimeout(() => laser.remove(), 100);
+        }
+    };
+
+    // --- MATH GAME U4: Law Match ---
+    const MathGameU4 = {
+        pairs: [
+            { l: "25 × 37 × 4", r: "(25 × 4) × 37" },
+            { l: "125 × 88", r: "125 × 8 × 11" },
+            { l: "a + b = b + a", r: "加法交换律" },
+            { l: "(a × b) × c = a × (b × c)", r: "乘法结合律" },
+            { l: "(a + b) × c", r: "a × c + b × c" },
+            { l: "102 × 45", r: "(100 + 2) × 45" }
+        ],
+        selected: null,
+        leftCount: 6,
+        
+        init: () => {
+            MathGameU4.leftCount = MathGameU4.pairs.length;
+            document.getElementById('u4-left').innerText = MathGameU4.leftCount;
+            document.getElementById('u4-msg').innerText = '';
+            
+            // Randomize Pairs
+            const lefts = MathGameU4.pairs.map((p, i) => ({ t: p.l, id: i }));
+            const rights = MathGameU4.pairs.map((p, i) => ({ t: p.r, id: i }));
+            lefts.sort(()=>Math.random()-0.5);
+            rights.sort(()=>Math.random()-0.5);
+            
+            const renderCol = (items, cid) => {
+                const col = document.getElementById(cid);
+                col.innerHTML = '';
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'u4-item';
+                    div.innerText = item.t;
+                    div.dataset.id = item.id;
+                    div.onclick = () => MathGameU4.click(div);
+                    col.appendChild(div);
+                });
+            };
+            renderCol(lefts, 'u4-col-left');
+            renderCol(rights, 'u4-col-right');
+        },
+        
+        click: (el) => {
+            if(el.classList.contains('matched')) return;
+            
+            if(MathGameU4.selected) {
+                // Check match
+                if(MathGameU4.selected === el) {
+                    el.classList.remove('selected');
+                    MathGameU4.selected = null;
+                    return;
+                }
+                
+                const id1 = MathGameU4.selected.dataset.id;
+                const id2 = el.dataset.id;
+                
+                if(id1 === id2) {
+                    // Match!
+                    MathGameU4.selected.classList.add('matched');
+                    el.classList.add('matched');
+                    MathGameU4.selected = null;
+                    MathGameU4.leftCount--;
+                    document.getElementById('u4-left').innerText = MathGameU4.leftCount;
+                    fireConfetti('mini');
+                    
+                    if(MathGameU4.leftCount === 0) {
+                        document.getElementById('u4-msg').innerHTML = "<span style='color:green'>🎉 全部消除！太棒了！</span>";
+                        fireConfetti('full');
+                    }
+                } else {
+                    // Wrong
+                    el.classList.add('wrong');
+                    MathGameU4.selected.classList.add('wrong');
+                    setTimeout(() => {
+                        el.classList.remove('wrong', 'selected');
+                        if(MathGameU4.selected) MathGameU4.selected.classList.remove('wrong', 'selected');
+                        MathGameU4.selected = null;
+                    }, 500);
+                }
+            } else {
+                // Select first
+                el.classList.add('selected');
+                MathGameU4.selected = el;
+            }
+        }
+    };
+
+    // --- MATH GAME U5: Coordinate Hunt ---
+    const MathGameU5 = {
+        target: {x:0, y:0},
+        score: 0,
+        
+        init: () => {
+            MathGameU5.score = 0;
+            MathGameU5.renderGrid();
+            MathGameU5.next();
+        },
+        
+        renderGrid: () => {
+            const grid = document.getElementById('u5-grid');
+            grid.innerHTML = '';
+            
+            // Header Row (Col Numbers)
+            grid.appendChild(MathGameU5.createCell('', 'header')); // corner
+            for(let x=1; x<=8; x++) grid.appendChild(MathGameU5.createCell(x, 'header'));
+            
+            // Grid Rows (Row Numbers + Cells)
+            for(let y=1; y<=8; y++) { // Visual y is 1..8, coordinate usually (col, row)
+                grid.appendChild(MathGameU5.createCell(y, 'header')); // Row label
+                for(let x=1; x<=8; x++) {
+                    const cell = MathGameU5.createCell('', 'cell');
+                    cell.dataset.x = x;
+                    cell.dataset.y = y;
+                    cell.onclick = () => MathGameU5.check(cell, x, y);
+                    grid.appendChild(cell);
+                }
+            }
+        },
+        
+        createCell: (text, type) => {
+            const div = document.createElement('div');
+            div.className = `u5-cell ${type}`;
+            div.innerText = text;
+            return div;
+        },
+        
+        next: () => {
+            MathGameU5.target = {
+                x: Math.floor(Math.random()*8)+1,
+                y: Math.floor(Math.random()*8)+1
+            };
+            document.getElementById('u5-q-text').innerText = `请挖掘宝藏：(${MathGameU5.target.x}, ${MathGameU5.target.y})`;
+            document.getElementById('u5-score').innerText = MathGameU5.score;
+            document.getElementById('u5-msg').innerText = '';
+            
+            // Clear grid styles
+            document.querySelectorAll('.u5-cell.cell').forEach(c => c.className = 'u5-cell cell');
+        },
+        
+        check: (cell, x, y) => {
+            if(x === MathGameU5.target.x && y === MathGameU5.target.y) {
+                cell.classList.add('treasure');
+                cell.innerText = '💎';
+                document.getElementById('u5-msg').innerHTML = "<span style='color:green'>🎉 挖到了！</span>";
+                MathGameU5.score++;
+                fireConfetti('mini');
+                setTimeout(MathGameU5.next, 1500);
+            } else {
+                cell.classList.add('miss');
+                cell.innerText = '❌';
+            }
+        }
+    };
+
+    // --- MATH GAME U7: Thermometer ---
+    const MathGameU7 = {
+        score: 0,
+        currentQ: {},
+        ctx: null,
+        previewTemp: null, // 存储当前选中的温度
+        
+        init: () => {
+            MathGameU7.score = 0;
+            const canvas = document.getElementById('u7-canvas');
+            MathGameU7.ctx = canvas.getContext('2d');
+            
+            // Mouse Move: Real-time preview & snap
+            canvas.onmousemove = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                // Clamp y to valid range (top: 20, bottom: 330)
+                const validY = Math.max(20, Math.min(y, 330));
+                
+                // Convert Y to Temp and Round to nearest integer
+                const temp = Math.round(MathGameU7.yToTemp(validY));
+                MathGameU7.previewTemp = temp;
+                
+                // Update Slider UI
+                const slider = document.getElementById('u7-slider');
+                const sliderY = MathGameU7.tempToY(temp);
+                slider.style.top = (sliderY - 13) + 'px'; // Center vertically (-13 is half height)
+                slider.style.display = 'flex';
+                slider.textContent = temp + '℃';
+            };
+            
+            // Click handler
+            canvas.onclick = (e) => {
+                if(MathGameU7.previewTemp !== null) {
+                    MathGameU7.check(MathGameU7.previewTemp);
+                }
+            };
+            
+            MathGameU7.draw();
+            MathGameU7.next();
+        },
+        
+        next: () => {
+            // Generate Q: Start -10 to 20. Change -10 to 10.
+            const start = Math.floor(Math.random()*20) - 5; 
+            const change = Math.floor(Math.random()*15) - 7;
+            const end = start + change;
+            
+            MathGameU7.currentQ = { end };
+            const desc = change >= 0 ? `上升了 ${change}℃` : `下降了 ${Math.abs(change)}℃`;
+            
+            document.getElementById('u7-q-text').innerHTML = `当前 <b style="color:#e74c3c">${start}℃</b>，气温${desc}<br>现在的温度是？`;
+            document.getElementById('u7-msg').innerText = '';
+            document.getElementById('u7-score').innerText = MathGameU7.score;
+            
+            // Initial slider position (at start temp)
+            const startY = MathGameU7.tempToY(start);
+            const slider = document.getElementById('u7-slider');
+            slider.style.top = (startY - 13) + 'px';
+            slider.textContent = start + '℃';
+            MathGameU7.previewTemp = start;
+        },
+        
+        check: (userTemp) => {
+            const target = MathGameU7.currentQ.end;
+            if(userTemp === target) {
+                document.getElementById('u7-msg').innerHTML = "<span style='color:green'>🎉 正确！是 "+target+"℃</span>";
+                MathGameU7.score++;
+                fireConfetti('mini');
+                setTimeout(MathGameU7.next, 1500);
+            } else {
+                document.getElementById('u7-msg').innerHTML = `<span style='color:red'>❌ 不对，你选的是 ${userTemp}℃</span>`;
+            }
+        },
+        
+        tempToY: (t) => {
+            const range = 60; // 40 - (-20)
+            const p = (40 - t) / range; 
+            return 20 + p * 310;
+        },
+        yToTemp: (y) => {
+            const p = (y - 20) / 310;
+            return 40 - (p * 60);
+        },
+        
+        draw: () => {
+            const ctx = MathGameU7.ctx;
+            const w = 100, h = 350;
+            ctx.clearRect(0,0,w,h);
+            
+            // Draw Tube
+            ctx.fillStyle = '#ecf0f1';
+            ctx.fillRect(20, 10, 20, h-20);
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.arc(30, h-25, 15, 0, Math.PI*2);
+            ctx.fill();
+            
+            // Draw Ticks
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            
+            for(let t=-20; t<=40; t++) { // Every 1 degree
+                const y = MathGameU7.tempToY(t);
+                const isMajor = (t % 5 === 0);
+                
+                ctx.fillStyle = isMajor ? '#333' : '#bdc3c7'; // Major black, minor gray
+                const len = isMajor ? 12 : 6;
+                ctx.fillRect(20, y, len, 1);
+                
+                if(isMajor) {
+                    ctx.fillStyle = '#333';
+                    ctx.font = 'bold 12px Arial';
+                    ctx.fillText(t, 18, y);
+                }
+            }
         }
     };
 
