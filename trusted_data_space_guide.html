@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可信数据空间：概念、技术与应用全景指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .sidebar-link.active {
+            background-color: #2563eb;
+            color: white;
+            border-radius: 0.5rem;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .tech-card {
+            transition: transform 0.2s;
+        }
+        
+        .tech-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .mermaid {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg overflow-y-auto flex-shrink-0 z-10 hidden md:block">
+            <div class="p-6 border-b">
+                <h1 class="text-xl font-bold text-blue-700"><i class="fas fa-network-wired mr-2"></i>可信数据空间</h1>
+                <p class="text-xs text-gray-500 mt-1">2025 创新发展与实践指南</p>
+            </div>
+            <nav class="p-4 space-y-2">
+                <a href="#" onclick="showSection('intro')" class="sidebar-link active flex items-center p-3 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                    <i class="fas fa-home w-6"></i> 概述与发展历程
+                </a>
+                <a href="#" onclick="showSection('architecture')" class="sidebar-link flex items-center p-3 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                    <i class="fas fa-layer-group w-6"></i> 技术体系总览
+                </a>
+                <a href="#" onclick="showSection('identity')" class="sidebar-link flex items-center p-3 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors ml-4 border-l-2 border-gray-200">
+                    <i class="fas fa-id-card w-6"></i> 身份管控体系
+                </a>
+                <a href="#" onclick="showSection('interop')" class="sidebar-link flex items-center p-3 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors ml-4 border-l-2 border-gray-200">
+                    <i class="fas fa-link w-6"></i> 互联互通体系
+                </a>
+                <a href="#" onclick="showSection('control')" class="sidebar-link flex items-center p-3 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors ml-4 border-l-2 border-gray-200">
+                    <i class="fas fa-shield-alt w-6"></i> 可信管控技术
+                </a>
+                <a href="#" onclick="showSection('trace')" class="sidebar-link flex items-center p-3 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors ml-4 border-l-2 border-gray-200">
+                    <i class="fas fa-history w-6"></i> 存证溯源技术
+                </a>
+                <a href="#" onclick="showSection('operation')" class="sidebar-link flex items-center p-3 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                    <i class="fas fa-users-cog w-6"></i> 运营与规则体系
+                </a>
+                <a href="#" onclick="showSection('shenzhen')" class="sidebar-link flex items-center p-3 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors border-t border-gray-100 mt-2 pt-2">
+                    <i class="fas fa-city w-6"></i> 深数空间实践
+                </a>
+                <a href="#" onclick="showSection('solutions')" class="sidebar-link flex items-center p-3 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                    <i class="fas fa-briefcase w-6"></i> 行业解决方案
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-8 relative">
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden absolute top-4 right-4 p-2 bg-white rounded shadow text-gray-600">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- 1. 概述与发展历程 -->
+            <section id="intro" class="content-section active max-w-5xl mx-auto">
+                <header class="mb-10 border-b pb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">可信数据空间的发展历程</h2>
+                    <p class="mt-4 text-lg text-gray-600">从理论概念到“数据要素×”的商业落地实践</p>
+                </header>
+
+                <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-blue-800">核心定义</h3>
+                    <p class="mb-4 leading-relaxed">
+                        可信数据空间（Trusted Data Space）是基于共识规则，由互联互通的数字化基础设施构建的，能够实现数据资源在不同主体间<span class="font-bold text-blue-600">安全、可信、可控</span>流通与共享的数据流通环境。它是支撑构建全国一体化数据市场的重要载体，也是实现数据要素价值共创的应用生态。
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-10">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+                        <h4 class="font-bold text-lg mb-3">🇪🇺 欧盟：规则与标准的先行者</h4>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li><strong class="text-gray-900">起源：</strong> 2015-2016年，德国工业4.0背景下提出，成立IDSA（国际数据空间协会）。</li>
+                            <li><strong class="text-gray-900">发展：</strong> 2019年启动 Gaia-X 计划，旨在建立欧洲联邦云数据基础设施，强调数字主权。</li>
+                            <li><strong class="text-gray-900">关键成果：</strong> 发布 IDS 参考架构模型（IDS-RAM），定义了连接器（Connector）、身份认证中心等核心组件。</li>
+                            <li><strong class="text-gray-900">现状：</strong> 推动 Catena-X（汽车网络）等行业空间落地，形成 Dataspace Protocol (DSP) 协议标准。</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500">
+                        <h4 class="font-bold text-lg mb-3">🇨🇳 中国：场景驱动与要素化实践</h4>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li><strong class="text-gray-900">起步：</strong> 2021年前后引入概念，与“数据要素”战略深度结合。</li>
+                            <li><strong class="text-gray-900">爆发：</strong> 2024年印发《可信数据空间发展行动计划（2024—2028年）》，成立可信数据空间发展联盟（TDSA）。</li>
+                            <li><strong class="text-gray-900">特色：</strong> 强调“数据要素×”三年行动计划，注重行业应用试点（如北京、上海、深圳数据交易所探索）。</li>
+                            <li><strong class="text-gray-900">2025现状：</strong> 迈入实践落地阶段。首批63个国家级试点项目启动，涵盖金融、制造、医疗等领域，强调“信任为基础、价值为激励”。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-xl font-bold mb-6">演进路线图</h3>
+                    <div class="relative py-10 overflow-x-auto">
+                        <!-- Horizontal Line (Desktop) -->
+                        <div class="hidden md:block absolute top-14 left-0 w-full h-1 bg-gray-200 z-0"></div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 relative z-10 min-w-[800px]">
+                            <!-- 2016 -->
+                            <a href="https://internationaldataspaces.org/" target="_blank" class="block bg-white p-5 rounded-xl shadow-sm border-2 border-gray-200 hover:border-blue-500 hover:shadow-md transition-all group cursor-pointer text-left no-underline">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-2xl font-bold text-gray-400 group-hover:text-blue-600 transition-colors">2016</span>
+                                    <i class="fas fa-external-link-alt text-xs text-gray-300 group-hover:text-blue-500"></i>
+                                </div>
+                                <div class="w-4 h-4 bg-gray-300 rounded-full mb-4 border-4 border-white group-hover:bg-blue-500 transition-colors relative z-20 md:mx-auto md:hidden"></div>
+                                <!-- Dot for desktop line alignment -->
+                                <div class="hidden md:block w-4 h-4 bg-gray-200 rounded-full border-4 border-white group-hover:bg-blue-500 transition-colors absolute -top-[22px] left-1/2 transform -translate-x-1/2"></div>
+                                
+                                <h4 class="font-bold text-gray-900 mb-1">概念萌芽</h4>
+                                <p class="text-sm text-gray-600 leading-snug">
+                                    IDSA成立 (德国)<br>
+                                    提出数据主权概念
+                                </p>
+                            </a>
+
+                            <!-- 2019 -->
+                            <a href="https://gaia-x.eu/" target="_blank" class="block bg-white p-5 rounded-xl shadow-sm border-2 border-gray-200 hover:border-blue-500 hover:shadow-md transition-all group cursor-pointer text-left no-underline">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-2xl font-bold text-gray-400 group-hover:text-blue-600 transition-colors">2019</span>
+                                    <i class="fas fa-external-link-alt text-xs text-gray-300 group-hover:text-blue-500"></i>
+                                </div>
+                                <div class="hidden md:block w-4 h-4 bg-gray-200 rounded-full border-4 border-white group-hover:bg-blue-500 transition-colors absolute -top-[22px] left-1/2 transform -translate-x-1/2"></div>
+                                <h4 class="font-bold text-gray-900 mb-1">架构成型</h4>
+                                <p class="text-sm text-gray-600 leading-snug">
+                                    Gaia-X启动 (欧盟)<br>
+                                    发布IDS参考架构 (RAM)
+                                </p>
+                            </a>
+
+                            <!-- 2021 -->
+                            <a href="http://www.gov.cn/zhengce/2021-12/12/content_5660516.htm" target="_blank" class="block bg-white p-5 rounded-xl shadow-sm border-2 border-gray-200 hover:border-blue-500 hover:shadow-md transition-all group cursor-pointer text-left no-underline">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-2xl font-bold text-gray-400 group-hover:text-blue-600 transition-colors">2021</span>
+                                    <i class="fas fa-external-link-alt text-xs text-gray-300 group-hover:text-blue-500"></i>
+                                </div>
+                                <div class="hidden md:block w-4 h-4 bg-gray-200 rounded-full border-4 border-white group-hover:bg-blue-500 transition-colors absolute -top-[22px] left-1/2 transform -translate-x-1/2"></div>
+                                <h4 class="font-bold text-gray-900 mb-1">中国探索</h4>
+                                <p class="text-sm text-gray-600 leading-snug">
+                                    纳入数据要素研究<br>
+                                    “十四五”规划布局
+                                </p>
+                            </a>
+
+                            <!-- 2024 -->
+                            <a href="https://www.gov.cn/zhengce/zhengceku/202401/content_6924345.htm" target="_blank" class="block bg-white p-5 rounded-xl shadow-sm border-2 border-blue-500 hover:shadow-md transition-all group cursor-pointer text-left no-underline ring-2 ring-blue-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-2xl font-bold text-blue-600 transition-colors">2024</span>
+                                    <i class="fas fa-external-link-alt text-xs text-blue-300 group-hover:text-blue-500"></i>
+                                </div>
+                                <div class="hidden md:block w-4 h-4 bg-blue-500 rounded-full border-4 border-white transition-colors absolute -top-[22px] left-1/2 transform -translate-x-1/2"></div>
+                                <h4 class="font-bold text-gray-900 mb-1">政策驱动</h4>
+                                <p class="text-sm text-gray-600 leading-snug">
+                                    中国“数据要素×”<br>
+                                    三年行动计划发布
+                                </p>
+                            </a>
+
+                            <!-- 2025 -->
+                            <a href="http://data-spaces.org.cn/" target="_blank" class="block bg-white p-5 rounded-xl shadow-sm border-2 border-gray-200 hover:border-blue-500 hover:shadow-md transition-all group cursor-pointer text-left no-underline">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-2xl font-bold text-gray-400 group-hover:text-blue-600 transition-colors">2025</span>
+                                    <i class="fas fa-external-link-alt text-xs text-gray-300 group-hover:text-blue-500"></i>
+                                </div>
+                                <div class="hidden md:block w-4 h-4 bg-gray-200 rounded-full border-4 border-white group-hover:bg-blue-500 transition-colors absolute -top-[22px] left-1/2 transform -translate-x-1/2"></div>
+                                <h4 class="font-bold text-gray-900 mb-1">规模落地</h4>
+                                <p class="text-sm text-gray-600 leading-snug">
+                                    首批63个国家级试点<br>
+                                    跨域融合与商业闭环
+                                </p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. 技术体系总览 -->
+            <section id="architecture" class="content-section max-w-5xl mx-auto">
+                <header class="mb-10 border-b pb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">技术体系总览</h2>
+                    <p class="mt-4 text-lg text-gray-600">四大支柱构建“可信、可控、可证”的流通环境，解决数据“不敢享、不愿享、不会享”的难题。</p>
+                </header>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-10">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-blue-500">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold mr-3">1</div>
+                            <h3 class="text-xl font-bold text-gray-900">身份管理</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            解决运行于可信数据空间中的各类主体身份的问题，包括主体身份、数据身份、接入点（连接器）身份的可信认证等问题。
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-green-500">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold mr-3">2</div>
+                            <h3 class="text-xl font-bold text-gray-900">互联互通</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            重点解决身份互通、数据互通、语义互通问题，打破数据孤岛，实现不同空间之间的对话。
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-indigo-500">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold mr-3">3</div>
+                            <h3 class="text-xl font-bold text-gray-900">可信管控技术</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            重点保障数据流通利用全过程的可管可控，是整个可信数据空间体系的核心体系。
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-orange-500">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold mr-3">4</div>
+                            <h3 class="text-xl font-bold text-gray-900">存证溯源技术</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            重点解决数据流通利用过程中的关键事件、重点行为的存证和溯源，确保全链路可追溯。
+                        </p>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- 3.1 身份管控 -->
+            <section id="identity" class="content-section max-w-5xl mx-auto">
+                <header class="mb-8">
+                    <h2 class="text-2xl font-bold text-blue-800">1. 身份管控体系 (Identity Management)</h2>
+                    <p class="text-gray-600 mt-2">确保参与方身份真实有效，是建立信任的第一道关卡。</p>
+                </header>
+
+                <div class="space-y-8">
+                    <!-- 演变 -->
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-lg mb-4 border-l-4 border-blue-500 pl-3">技术演变与原理</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm text-left text-gray-500">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 w-1/6">发展阶段</th>
+                                        <th class="px-6 py-3 w-1/4">核心特征与逻辑</th>
+                                        <th class="px-6 py-3 w-1/4">关键技术与协议</th>
+                                        <th class="px-6 py-3 w-1/3">优缺点与现状</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Stage 1 -->
+                                    <tr class="border-b hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold text-gray-900">第一阶段</div>
+                                            <div class="flex items-center text-red-600 font-semibold mt-1">
+                                                <i class="fas fa-shield-alt mr-1"></i> 中心化身份
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1">(孤岛时代)</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold mb-1">边界防护</div>
+                                            <p class="mb-2">基于边界，默认信任防火墙内部流量。</p>
+                                            <div class="bg-gray-100 px-2 py-1 rounded text-xs italic">
+                                                “一把钥匙开一把锁”
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <ul class="list-disc list-inside space-y-1">
+                                                <li>LDAP / AD</li>
+                                                <li>Kerberos</li>
+                                                <li>本地数据库</li>
+                                            </ul>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="mb-2"><span class="text-red-500 font-bold">● 缺点：</span>信息孤岛严重，账号维护成本高，离职未注销风险大。</div>
+                                            <div><span class="text-gray-400 font-bold">● 现状：</span>传统企业内网依然大量存在。</div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Stage 2 -->
+                                    <tr class="border-b bg-blue-50/20 hover:bg-blue-50/50 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold text-gray-900">第二阶段</div>
+                                            <div class="flex items-center text-blue-600 font-semibold mt-1">
+                                                <i class="fas fa-globe mr-1"></i> 联盟化身份
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1">(云与SSO时代)</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold mb-1">互联互通</div>
+                                            <p class="mb-2">基于互信，应用系统信任 IdP 颁发的令牌。</p>
+                                            <div class="bg-blue-100 px-2 py-1 rounded text-xs italic text-blue-800">
+                                                “一本护照通关多国”
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <ul class="list-disc list-inside space-y-1">
+                                                <li>SAML (企业级)</li>
+                                                <li>OIDC / OAuth 2.0</li>
+                                                <li>JWT (令牌)</li>
+                                            </ul>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="mb-2"><span class="text-green-500 font-bold">● 优点：</span>用户体验好(SSO)，管理效率提升。</div>
+                                            <div class="mb-2"><span class="text-red-500 font-bold">● 缺点：</span>一旦IdP被攻破所有系统遭殃；授权粒度较粗。</div>
+                                            <div><span class="text-gray-400 font-bold">● 现状：</span>当前互联网和企业应用的主流模式。</div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Stage 3 -->
+                                    <tr class="border-b hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold text-gray-900">第三阶段</div>
+                                            <div class="flex items-center text-indigo-600 font-semibold mt-1">
+                                                <i class="fas fa-user-secret mr-1"></i> 零信任身份
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1">(智能化时代)</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold mb-1">动态风控</div>
+                                            <p class="mb-2">基于上下文，永不信任，持续验证。只看行为是否异常。</p>
+                                            <div class="bg-indigo-100 px-2 py-1 rounded text-xs italic text-indigo-800">
+                                                “每次访问都需安检”
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <ul class="list-disc list-inside space-y-1">
+                                                <li>MFA (多因素认证)</li>
+                                                <li>UEBA (用户行为分析)</li>
+                                                <li>IGA (身份治理)</li>
+                                            </ul>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="mb-2"><span class="text-green-500 font-bold">● 优点：</span>安全性极高，防范凭证窃取和内部威胁。</div>
+                                            <div class="mb-2"><span class="text-red-500 font-bold">● 缺点：</span>建设成本高，可能会牺牲一点用户体验。</div>
+                                            <div><span class="text-gray-400 font-bold">● 现状：</span>成熟企业正在大力建设的阶段。</div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Stage 4 -->
+                                    <tr class="bg-green-50/20 hover:bg-green-50/50 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold text-gray-900">第四阶段</div>
+                                            <div class="flex items-center text-green-600 font-semibold mt-1">
+                                                <i class="fas fa-wallet mr-1"></i> 去中心化身份
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1">(Web3时代)</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold mb-1">用户主权</div>
+                                            <p class="mb-2">基于密码学证明，不依赖中心机构，数据确权。</p>
+                                            <div class="bg-green-100 px-2 py-1 rounded text-xs italic text-green-800">
+                                                “数据装进用户自己的钱包”
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <ul class="list-disc list-inside space-y-1">
+                                                <li>DID (分布式数字身份)</li>
+                                                <li>VC (可验证凭证)</li>
+                                                <li>ZKP (零知识证明)</li>
+                                                <li>区块链/分布式账本</li>
+                                            </ul>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="mb-2"><span class="text-green-500 font-bold">● 优点：</span>彻底解决隐私泄露问题，用户完全掌控数据。</div>
+                                            <div class="mb-2"><span class="text-red-500 font-bold">● 缺点：</span>技术门槛高，标准尚在完善，普及度低。</div>
+                                            <div><span class="text-gray-400 font-bold">● 现状：</span>处于探索和早期试点阶段。</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 实践案例 -->
+                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                        <h4 class="font-bold text-gray-900 mb-2"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>实践案例</h4>
+                        <p class="text-sm text-gray-700">
+                            <strong>欧盟 Gaia-X：</strong> 使用“Trust Anchors”和可验证凭证（VC）来验证云服务商是否符合GDPR合规要求。<br>
+                            <strong>中国某能源数据空间：</strong> 采用分布式数字身份（DID）为电厂、电网、用户分配身份，确保数据上传者的身份不可抵赖，且无需中心化数据库存储所有企业隐私。
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3.2 互联互通 -->
+            <section id="interop" class="content-section max-w-5xl mx-auto">
+                <header class="mb-8">
+                    <h2 class="text-2xl font-bold text-blue-800">2. 互联互通体系 (Interconnectivity)</h2>
+                    <p class="text-gray-600 mt-2">打破数据孤岛，实现不同系统、不同空间之间的对话。</p>
+                </header>
+
+                <!-- 新增：资源交互技术体系 -->
+                <div class="mb-10">
+                    <h3 class="font-bold text-lg mb-4 text-gray-900 border-l-4 border-blue-500 pl-3">可信数据空间资源交互技术体系</h3>
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <div class="max-w-3xl mx-auto space-y-4">
+                            
+                            <!-- 1. 应用协议 (蓝色) -->
+                            <div class="border-2 border-blue-400 rounded-lg overflow-hidden bg-white shadow-sm">
+                                <div class="bg-blue-500 text-white font-bold py-2 px-4 text-center">
+                                    可信数据空间应用协议
+                                </div>
+                                <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div class="bg-blue-50 text-blue-800 text-sm font-medium py-2 px-3 rounded text-center border border-blue-100">身份互认协议</div>
+                                    <div class="bg-blue-50 text-blue-800 text-sm font-medium py-2 px-3 rounded text-center border border-blue-100">数据传输协议</div>
+                                    <div class="bg-blue-50 text-blue-800 text-sm font-medium py-2 px-3 rounded text-center border border-blue-100">数字合约协同执行协议</div>
+                                    <div class="bg-blue-50 text-blue-800 text-sm font-medium py-2 px-3 rounded text-center border border-blue-100">日志存证协议</div>
+                                </div>
+                            </div>
+
+                            <!-- 2. 数据目录 (绿色) -->
+                            <div class="border-2 border-green-400 rounded-lg overflow-hidden bg-white shadow-sm">
+                                <div class="bg-green-500 text-white font-bold py-2 px-4 text-center">
+                                    数据目录元数据规范
+                                </div>
+                                <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div class="bg-green-50 text-green-800 text-sm font-medium py-2 px-3 rounded text-center border border-green-100">元数据核心要素规范</div>
+                                    <div class="bg-green-50 text-green-800 text-sm font-medium py-2 px-3 rounded text-center border border-green-100">跨空间元数据互映射规范</div>
+                                </div>
+                            </div>
+
+                            <!-- 3. 标识与寻址 (橙色) -->
+                            <div class="border-2 border-orange-400 rounded-lg overflow-hidden bg-white shadow-sm">
+                                <div class="bg-orange-400 text-white font-bold py-2 px-4 text-center">
+                                    数据标识与寻址
+                                </div>
+                                <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div class="bg-orange-50 text-orange-800 text-sm font-medium py-2 px-3 rounded text-center border border-orange-100">可信数据唯一标识编码规范</div>
+                                    <div class="bg-orange-50 text-orange-800 text-sm font-medium py-2 px-3 rounded text-center border border-orange-100">跨空间数据标识解析协议</div>
+                                    <div class="bg-orange-50 text-orange-800 text-sm font-medium py-2 px-3 rounded text-center border border-orange-100">分布式数据目录寻址路由协议</div>
+                                    <div class="bg-orange-50 text-orange-800 text-sm font-medium py-2 px-3 rounded text-center border border-orange-100">数据标识-元数据关联规范</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-lg mb-3">互联互通的三个层面</h3>
+                        <ul class="list-disc list-inside space-y-2 text-sm text-gray-700">
+                            <li><strong>协议互通：</strong> 大家都说同一种语言（如 HTTPs + Dataspace Protocol），规定怎么握手、怎么传目录。</li>
+                            <li><strong>身份互认：</strong> 你的通行证我也认（基于信任锚点的互信）。</li>
+                            <li><strong>语义互通：</strong> 大家都懂“温度”指的是摄氏度还是华氏度（使用词汇表/本体库）。</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-lg mb-3">核心组件：连接器 (Connector)</h3>
+                        <p class="text-sm text-gray-700 mb-2">
+                            <strong>原理：</strong> 连接器是数据空间的“网关”或“路由器”。企业不直接把数据发给对方，而是通过连接器。
+                        </p>
+                        <p class="text-sm text-gray-700">
+                            它负责：
+                            <br>1. 验证对方身份。
+                            <br>2. 检查对方是否有“合约”（使用权限）。
+                            <br>3. 记录日志。
+                            <br>4. 执行数据传输。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h4 class="font-bold text-gray-900 mb-2"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>实践案例</h4>
+                    <p class="text-sm text-gray-700">
+                        <strong>Catena-X (汽车联盟)：</strong> 宝马、大众等车企通过 Eclipse Dataspace Components (EDC) 连接器，在不将数据汇聚到一个大池子的情况下，互相查询零部件的碳足迹数据。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 3.3 可信管控 -->
+            <section id="control" class="content-section max-w-5xl mx-auto">
+                <header class="mb-8">
+                    <h2 class="text-2xl font-bold text-blue-800">3. 可信管控技术 (Trusted Control)</h2>
+                    <p class="text-gray-600 mt-2">核心难题：如何让数据“可用不可见”或“可见不可存”。</p>
+                </header>
+
+                <div class="space-y-10">
+                    <p class="text-gray-700">
+                        可信管控技术定义了一套从策略制定到技术强制执行的体系，确保数据只能按照约定的方式（时间、次数、用途）被处理。
+                    </p>
+
+                    <!-- 技术方向对比卡片 -->
+                    <div class="grid lg:grid-cols-2 gap-6">
+                        
+                        <!-- 1. 使用控制 -->
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500 tech-card">
+                            <h3 class="font-bold text-xl mb-2 text-indigo-700">A. 使用控制 (Usage Control)</h3>
+                            <div class="text-sm space-y-2 text-gray-600">
+                                <p><strong>基本原理：</strong> 给数据贴上“封条”和“说明书”（ODRL策略）。如“只能在2025年前读取3次”。连接器在传输前、使用中拦截检查。</p>
+                                <p><strong>可见性：</strong> <span class="text-yellow-600">数据内容可见</span>（通常），但行为受控。</p>
+                                <p><strong>管理模式：</strong> 分布式执行（在数据接收端通过受控环境执行）。</p>
+                                <p><strong>效率/成本：</strong> <span class="text-green-600">高效率 / 低成本</span>。</p>
+                                <p><strong>适用场景：</strong> 版权保护、普通商业数据交换。</p>
+                            </div>
+                        </div>
+
+                        <!-- 2. 隐私计算 - 联邦学习 -->
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500 tech-card">
+                            <h3 class="font-bold text-xl mb-2 text-purple-700">B. 联邦学习 (Federated Learning)</h3>
+                            <div class="text-sm space-y-2 text-gray-600">
+                                <p><strong>基本原理：</strong> “数据不动模型动”。算法模型下发到各家医院/银行本地训练，只把更新的参数（梯度）传回中央聚合，原始数据不出域。</p>
+                                <p><strong>可见性：</strong> <span class="text-green-600">原始数据不可见</span>。</p>
+                                <p><strong>管理模式：</strong> 逻辑集中协调，数据分布式存储。</p>
+                                <p><strong>效率/成本：</strong> 中等效率 / 中等成本（需通信迭代）。</p>
+                                <p><strong>适用场景：</strong> 医疗联合建模、反洗钱风控（数据量大，只需模型）。</p>
+                            </div>
+                        </div>
+
+                        <!-- 3. 隐私计算 - 多方安全计算 -->
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500 tech-card">
+                            <h3 class="font-bold text-xl mb-2 text-purple-700">C. 多方安全计算 (MPC)</h3>
+                            <div class="text-sm space-y-2 text-gray-600">
+                                <p><strong>基本原理：</strong> “数据拆碎了算”。将数据通过密码学切片（Secret Sharing），多方各拿一片进行计算，谁都不知道原始数据，最后拼出结果。</p>
+                                <p><strong>可见性：</strong> <span class="text-green-600">原始数据绝对不可见</span>（理论安全）。</p>
+                                <p><strong>管理模式：</strong> 分布式协同。</p>
+                                <p><strong>效率/成本：</strong> <span class="text-red-600">低效率 / 高计算成本</span>（通信开销大）。</p>
+                                <p><strong>适用场景：</strong> 高敏感数据的简单统计（如“百万富翁问题”、薪资调查）。</p>
+                            </div>
+                        </div>
+
+                        <!-- 4. 可信执行环境 (TEE) -->
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-gray-700 tech-card">
+                            <h3 class="font-bold text-xl mb-2 text-gray-800">D. 可信执行环境 (TEE/沙箱)</h3>
+                            <div class="text-sm space-y-2 text-gray-600">
+                                <p><strong>基本原理：</strong> “黑盒子里算”。利用CPU硬件（如Intel SGX, ARM TrustZone）构建一个加密的内存区域。操作系统和管理员都看不了里面的数据。</p>
+                                <p><strong>可见性：</strong> <span class="text-green-600">硬件级不可见</span>。</p>
+                                <p><strong>管理模式：</strong> 集中式或分布式节点。</p>
+                                <p><strong>效率/成本：</strong> <span class="text-green-600">接近原生的高效率</span> / 硬件依赖成本。</p>
+                                <p><strong>适用场景：</strong> 通用计算任务、复杂的联合分析。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3.4 存证溯源 -->
+            <section id="trace" class="content-section max-w-5xl mx-auto">
+                <header class="mb-8">
+                    <h2 class="text-2xl font-bold text-blue-800">4. 存证溯源技术 (Provenance & Traceability)</h2>
+                    <p class="text-gray-600 mt-2">确权、追责与审计的基础。</p>
+                </header>
+
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="font-bold text-lg mb-4">存什么？怎么存？</h3>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700 mb-6">
+                        <li><strong>存证内容：</strong> 数据目录元数据、合约（Usage Policy）、每一次的数据传输日志（谁、何时、传了什么）、操作记录。注意：<span class="text-red-500">通常不存原始数据本身</span>。</li>
+                        <li><strong>技术体系：</strong>
+                            <ul class="list-disc list-inside ml-6 mt-2 text-sm text-gray-600">
+                                <li><strong>区块链 (Blockchain)：</strong> 利用其不可篡改性，存储合约哈希和关键日志哈希。</li>
+                                <li><strong>智能合约：</strong> 自动记录交易结算。</li>
+                                <li><strong>数字水印：</strong> 在数据（如图片、文档）中嵌入隐形标记，一旦泄露可追溯源头。</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="bg-blue-50 p-4 rounded border-l-4 border-blue-500">
+                        <p class="text-sm"><strong>实践案例：</strong> 某消费品质量可信追溯空间。利用区块链记录从工厂生产、物流运输到商场销售的全链路数据指纹。消费者扫码即可验证商品真伪，且数据来源不可篡改。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. 运营体系 -->
+            <section id="operation" class="content-section max-w-5xl mx-auto">
+                <header class="mb-10 border-b pb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">运营与规则体系</h2>
+                    <p class="mt-4 text-lg text-gray-600">技术是底座，运营是灵魂。如何构建可持续的商业闭环？</p>
+                </header>
+
+                <div class="mb-10">
+                    <h3 class="text-xl font-bold mb-6 text-center">角色分工与职责</h3>
+                    <div class="grid md:grid-cols-3 gap-6 text-center">
+                        <div class="p-6 bg-white rounded-lg shadow-sm border hover:shadow-md transition">
+                            <div class="text-4xl text-blue-500 mb-4"><i class="fas fa-server"></i></div>
+                            <h4 class="font-bold mb-2">数据持有方 (Provider)</h4>
+                            <p class="text-sm text-gray-600">拥有数据资源，定义使用策略，通过数据共享获取收益。</p>
+                        </div>
+                        <div class="p-6 bg-white rounded-lg shadow-sm border hover:shadow-md transition">
+                            <div class="text-4xl text-green-500 mb-4"><i class="fas fa-laptop-code"></i></div>
+                            <h4 class="font-bold mb-2">数据使用方 (Consumer)</h4>
+                            <p class="text-sm text-gray-600">创造应用场景，支付费用或提供服务，挖掘数据价值。</p>
+                        </div>
+                        <div class="p-6 bg-white rounded-lg shadow-sm border hover:shadow-md transition">
+                            <div class="text-4xl text-purple-500 mb-4"><i class="fas fa-cogs"></i></div>
+                            <h4 class="font-bold mb-2">空间运营方 (Operator)</h4>
+                            <p class="text-sm text-gray-600">搭建基础设施，制定规则，进行身份认证与审计，通常是第三方公立机构或行业龙头。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-8 rounded-xl border border-gray-200">
+                    <h3 class="text-xl font-bold mb-4">利益分配与规则设定</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold mr-3">1</div>
+                            <div>
+                                <h5 class="font-bold text-gray-900">准入与退出机制</h5>
+                                <p class="text-sm text-gray-600">必须通过身份认证（KYC）和安全能力评估才能加入。违规者（如私存数据）将被吊销凭证并公示。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold mr-3">2</div>
+                            <div>
+                                <h5 class="font-bold text-gray-900">利益分配模式</h5>
+                                <p class="text-sm text-gray-600">
+                                    <strong>直接交易：</strong> 数据按次/按量计费，银货两讫。<br>
+                                    <strong>增值分成：</strong> 使用方基于数据开发出AI模型或SaaS服务，收益按比例（如3:7）回馈给数据提供方。<br>
+                                    <strong>积分置换：</strong> 联盟链内部积分，贡献数据得积分，消耗积分查数据（适合科研/公益）。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. 行业解决方案 -->
+            <section id="solutions" class="content-section max-w-5xl mx-auto">
+                <header class="mb-10 border-b pb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">行业应用解决方案</h2>
+                    <p class="mt-4 text-lg text-gray-600">基于“2025年空间试点分析”的场景设计</p>
+                </header>
+
+                <div class="space-y-12">
+                    <!-- 1. 医疗卫生 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-teal-500 to-teal-700 p-4 text-white">
+                            <h3 class="text-xl font-bold"><i class="fas fa-heartbeat mr-2"></i>医疗卫生：跨机构临床科研协作空间</h3>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">解决问题 (目标)</h4>
+                                    <ul class="list-disc list-inside text-sm text-gray-600">
+                                        <li><strong>业务：</strong> 解决单一医院样本少、病种单一，无法训练高精度AI模型的问题。</li>
+                                        <li><strong>技术：</strong> 医院数据绝不出院，保护患者隐私。</li>
+                                        <li><strong>数据：</strong> 打通电子病历(EMR)、影像(PACS)等多模态数据。</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">闭环与技术承载</h4>
+                                    <p class="text-sm text-gray-600 mb-2"><strong>技术选型：</strong> 联邦学习 (FL) + TEE。</p>
+                                    <p class="text-sm text-gray-600"><strong>闭环链路：</strong> 药企发布需求 -> 空间分发任务 -> 医院节点本地训练 -> 返回梯度 -> 聚合模型 -> 药企付费 -> 智能合约自动分润给医院。</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded text-sm">
+                                <strong>成本评估：</strong> 初期需投入约5-8人（安全架构师、联邦学习算法工程师、医疗数据治理专家）。资金主要用于节点服务器（TEE硬件）部署和数据治理清洗，约200-500万起步。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 民生诉求 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-orange-400 to-red-500 p-4 text-white">
+                            <h3 class="text-xl font-bold"><i class="fas fa-city mr-2"></i>民生诉求：城市基层治理数据空间</h3>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">解决问题 (目标)</h4>
+                                    <ul class="list-disc list-inside text-sm text-gray-600">
+                                        <li><strong>业务：</strong> “12345”热线、网格员、物业数据分散，基层治理“看得见管不着”。</li>
+                                        <li><strong>技术：</strong> 跨部门（城管、交通、社区）数据实时融合与隐私脱敏。</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">闭环与技术承载</h4>
+                                    <p class="text-sm text-gray-600 mb-2"><strong>技术选型：</strong> 互联互通连接器 + 数据沙箱。</p>
+                                    <p class="text-sm text-gray-600"><strong>闭环链路：</strong> 居民投诉 -> 空间汇聚多方数据（如噪音监测、交通流量） -> 智能分析归因 -> 派单给职能部门 -> 处置反馈上链存证。</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded text-sm">
+                                <strong>运营模式：</strong> 政府主导（大数据局作为Operator），企业建设。利益分配不以现金为主，而是以“政务考核加分”或“数据资源置换”为激励。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 金融领域 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-600 to-indigo-800 p-4 text-white">
+                            <h3 class="text-xl font-bold"><i class="fas fa-coins mr-2"></i>金融领域：中小微企业供应链金融空间</h3>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">解决问题 (目标)</h4>
+                                    <ul class="list-disc list-inside text-sm text-gray-600">
+                                        <li><strong>业务：</strong> 中小企业无抵押、融资难；银行不敢贷。</li>
+                                        <li><strong>数据：</strong> 整合核心企业订单、物流仓储、税务发票数据。</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">闭环与技术承载</h4>
+                                    <p class="text-sm text-gray-600 mb-2"><strong>技术选型：</strong> 多方安全计算 (MPC) + 区块链存证。</p>
+                                    <p class="text-sm text-gray-600"><strong>闭环链路：</strong> 企业申请贷款 -> 银行发起查询请求 -> 空间联合计算企业经营评分（不泄露具体订单金额，只出评分结果） -> 银行放款 -> 贷后实时监控。</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded text-sm">
+                                <strong>成本评估：</strong> 人力成本较高在于“数据产品化”设计（懂金融又懂数据的人）。资金成本主要在MPC计算节点的算力消耗。通过降低坏账率带来的收益远超技术投入。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. 深数空间逻辑体系 -->
+            <section id="shenzhen" class="content-section max-w-5xl mx-auto">
+                <header class="mb-10 border-b pb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">深数空间逻辑体系与实践</h2>
+                    <p class="mt-4 text-lg text-gray-600">基于“深圳数据流通利用基础设施”的标准化空间模板与运营范式</p>
+                </header>
+
+                <!-- Logic Architecture Diagram -->
+                <div class="bg-white p-6 rounded-xl shadow-sm mb-10">
+                    <h3 class="font-bold text-xl mb-6 text-center">深数空间逻辑架构图</h3>
+                    
+                    <!-- Image Display -->
+                    <div class="mt-4 text-center">
+                         <img src="shenzhen_logic.jpg" alt="深数空间逻辑架构图" class="mx-auto rounded-lg shadow-md"> 
+                    </div>
+
+                    <!-- Caption Below Image -->
+                    <p class="text-center text-sm text-gray-500 mt-4">深数空间逻辑体系架构</p>
+                </div>
+
+                <!-- 1. Roles & Responsibilities -->
+                <div class="mb-12">
+                    <h3 class="text-xl font-bold mb-6 text-blue-800 border-l-4 border-blue-500 pl-3">1. 角色与职责体系</h3>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+                            <div class="flex items-center mb-3 text-blue-600">
+                                <i class="fas fa-user-tie text-xl mr-2"></i>
+                                <h4 class="font-bold">空间运营方 (群主)</h4>
+                            </div>
+                            <p class="text-sm text-gray-600">核心组织者。负责“建群”、制定群规、审核成员准入、管理空间运行秩序。</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+                            <div class="flex items-center mb-3 text-red-600">
+                                <i class="fas fa-gavel text-xl mr-2"></i>
+                                <h4 class="font-bold">监管方</h4>
+                            </div>
+                            <p class="text-sm text-gray-600">负责业务全链路和数据流全链路的合规监管，接收认证上报。</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+                            <div class="flex items-center mb-3 text-gray-600">
+                                <i class="fas fa-server text-xl mr-2"></i>
+                                <h4 class="font-bold">基础设施服务方</h4>
+                            </div>
+                            <p class="text-sm text-gray-600">提供底层“三统一”接入能力、算力资源及基础可信技术支撑（如深圳数据交易所）。</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+                            <div class="flex items-center mb-3 text-green-600">
+                                <i class="fas fa-database text-xl mr-2"></i>
+                                <h4 class="font-bold">数据供给/需求方</h4>
+                            </div>
+                            <p class="text-sm text-gray-600">供给方负责数据治理、登记上架；需求方发起申请、合规使用数据。</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+                            <div class="flex items-center mb-3 text-purple-600">
+                                <i class="fas fa-tools text-xl mr-2"></i>
+                                <h4 class="font-bold">数据服务方</h4>
+                            </div>
+                            <p class="text-sm text-gray-600">提供数据治理、开发工具、算法模型等增值服务。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Core Logic Points -->
+                <div>
+                    <h3 class="text-xl font-bold mb-6 text-blue-800 border-l-4 border-blue-500 pl-3">2. 核心运作逻辑与设计思路</h3>
+                    <div class="space-y-6">
+                        
+                        <!-- Logic 1: Group Operation -->
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl font-bold">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900">组织运作：“群组化”管理模式</h4>
+                                <p class="mt-2 text-gray-600 text-sm leading-relaxed">
+                                    采用类似<strong>“拉群”</strong>的方式进行运作。
+                                    <br>● <strong>群主：</strong> 空间运营方，负责发起空间、邀请成员、制定群规（管理制度）。
+                                    <br>● <strong>群成员：</strong> 供给方、需求方、服务方等，在规则框架下进行互动。
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Logic 2: Infrastructure & Template -->
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl font-bold">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900">基础设施：“标准化”模板生成</h4>
+                                <p class="mt-2 text-gray-600 text-sm leading-relaxed">
+                                    整个运作构建在<strong>深圳数据流通利用基础设施</strong>之上。
+                                    <br>● 深数空间不仅仅是一个单一平台，而是一个具备“标准化”能力的<strong>工厂/模板</strong>。
+                                    <br>● 在构建具体的行业空间（如医疗空间、交通空间）时，通过调用该模板，快速生成对应的<strong>空间实例</strong>，实现快速部署与互联。
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Logic 3: Diversified Development -->
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xl font-bold">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900">开发利用：多元化模式支撑</h4>
+                                <p class="mt-2 text-gray-600 text-sm leading-relaxed">
+                                    针对不同敏感等级的数据，提供差异化的开发利用模式：
+                                    <br>● <strong>通用中心化开发：</strong> 适合低敏感、公开数据。
+                                    <br>● <strong>数据沙箱：</strong> “数据可用不可见”，适合中等敏感度数据。
+                                    <br>● <strong>隐私计算：</strong> 适合高敏感数据，原始数据不出域。
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Logic 4: Standardization -->
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xl font-bold">
+                                    <i class="fas fa-flag"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900">规范体系：遵从国家统一标准</h4>
+                                <p class="mt-2 text-gray-600 text-sm leading-relaxed">
+                                    身份管理和互联互通严格遵从<strong>国家数据流通利用基础设施</strong>制定的统一规范。
+                                    <br>● 探索并落实 <strong>身份互通</strong>、<strong>协议互通</strong> 和 <strong>语义互通</strong>，确保深数空间生成的每一个实例都能接入全国一体化网络。
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Logic 5: Blockchain Traceability -->
+                        <div class="flex">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="w-12 h-12 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center text-xl font-bold">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900">存证溯源：全链路区块链存证</h4>
+                                <p class="mt-2 text-gray-600 text-sm leading-relaxed">
+                                    <br>● <strong>业务流存证：</strong> 审批、授权、订单等业务行为上链。
+                                    <br>● <strong>技术流存证：</strong> 数据传输、计算过程、销毁记录上链。
+                                    <br>● 实现业务与技术全链路的<strong>可溯源、不可篡改</strong>，满足监管要求。
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        function showSection(id) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            // Show target section
+            document.getElementById(id).classList.add('active');
+            
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-link').forEach(el => {
+                el.classList.remove('active');
+                // Simple check if onclick contains the id
+                if(el.getAttribute('onclick').includes(id)) {
+                    el.classList.add('active');
+                }
+            });
+
+            // Mobile menu handling could go here
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大模型原理揭秘：超级"文字接龙"玩家</title>
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --accent-color: #fdcb6e;
+            --text-color: #2d3436;
+            --bg-color: #f0f3f5;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .metaphor-box {
+            background-color: #fff8e1;
+            border-left: 5px solid var(--accent-color);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .metaphor-icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        /* 核心原理动画模拟 */
+        .prediction-demo {
+            background: #2d3436;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .prediction-options {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .option {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            border: 1px solid transparent;
+        }
+
+        .option.best {
+            border-color: #00b894;
+            color: #00b894;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 184, 148, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 184, 148, 0); }
+        }
+
+        /* 训练三阶段 */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            margin: 0 0 5px 0;
+            color: #2d3436;
+        }
+
+        .step-content p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #636e72;
+        }
+
+        /* 厨房比喻表格 */
+        .kitchen-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .kitchen-table th, .kitchen-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dfe6e9;
+        }
+
+        .kitchen-table th {
+            background-color: #f1f2f6;
+            color: var(--primary-color);
+        }
+
+        .spotlight-demo {
+            position: relative;
+            padding: 20px;
+            background: #dfe6e9;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .word-span {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 2px;
+            background: white;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .word-span.focus {
+            background: var(--accent-color);
+            transform: scale(1.1);
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+        
+        .word-span.related {
+            background: #ffeaa7;
+            border: 2px dashed var(--accent-color);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #636e72;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🤖 大模型原理揭秘</h1>
+    <div class="subtitle">面向非技术人员的"人话"指南</div>
+</header>
+
+<div class="container">
+
+    <!-- 核心原理 -->
+    <div class="card">
+        <h2>1. 核心原理：超级"文字接龙"</h2>
+        <p>如果去掉所有高大上的技术名词，ChatGPT 等大模型做的事情只有一件：<strong>猜下一个字是什么</strong>。</p>
+        
+        <div class="metaphor-box">
+            <span class="metaphor-icon">💡</span>
+            <strong>比喻：</strong> 想象一个读了全世界所有书的神童，在玩猜词游戏。你起个头，他根据概率接下一个字。
+        </div>
+
+        <div class="prediction-demo">
+            输入：今天天气真不错，我想去...
+            <div class="prediction-options">
+                <div class="option best">公园 (25%)</div>
+                <div class="option">上班 (5%)</div>
+                <div class="option">火星 (0.01%)</div>
+            </div>
+        </div>
+        <p style="text-align: center; font-size: 0.9em; color: #666;">（模型选择了概率最高的"公园"，然后继续猜下一个字）</p>
+    </div>
+
+    <!-- 训练三部曲 -->
+    <div class="card">
+        <h2>2. 大模型是怎么"炼"成的？</h2>
+        <p>一个只会乱猜字的程序，如何变成全能助手？这需要三个阶段的"修炼"。</p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>预训练 (Pre-training)</h3>
+                    <p><strong>动作：</strong>给它看互联网上几乎所有的书和文章。<br><strong>结果：</strong>变成了<strong>"懂很多的书呆子"</strong>。博学但不懂人话（你问怎么做菜，它可能接着给你念菜谱的历史）。</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>微调 (Fine-tuning)</h3>
+                    <p><strong>动作：</strong>老师给它成千上万个"问答题"例子。<br><strong>结果：</strong>变成了<strong>"会考试的优等生"</strong>。学会了你问它答，学会了写代码、写摘要的格式。</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>人类反馈 (RLHF)</h3>
+                    <p><strong>动作：</strong>如果不礼貌就打手心，回答得好就给糖吃。<br><strong>结果：</strong>变成了<strong>"高情商的金牌客服"</strong>。学会了符合人类价值观，诚实、无害。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 理解能力 -->
+    <div class="card">
+        <h2>3. 它是怎么"理解"长句子的？</h2>
+        <p>为什么它知道"苹果"是指水果还是手机？因为它有<strong>"注意力机制 (Attention)"</strong>。</p>
+        
+        <div class="metaphor-box">
+            <span class="metaphor-icon">🔦</span>
+            <strong>比喻：聚光灯</strong><br>
+            当它读到某个词时，手里的聚光灯会照向句子里其他相关的词，瞬间建立联系。
+        </div>
+
+        <div class="spotlight-demo" id="spotlightDemo">
+            <span class="word-span">虽然</span>
+            <span class="word-span related">苹果</span>
+            <span class="word-span">手机</span>
+            <span class="word-span">很</span>
+            <span class="word-span">贵</span>
+            <span class="word-span">，</span>
+            <span class="word-span">但</span>
+            <span class="word-span">我</span>
+            <span class="word-span">还是</span>
+            <span class="word-span">买了</span>
+            <span class="word-span focus">它</span>
+        </div>
+        <p style="text-align: center; font-size: 0.9em; margin-top: 10px;">
+            当模型处理<strong>"它"</strong>时，聚光灯自动聚焦在<strong>"苹果"</strong>（主体）和<strong>"贵"</strong>（属性）上，而不是水果。
+        </p>
+    </div>
+
+    <!-- 厨房比喻 -->
+    <div class="card">
+        <h2>4. 总结：AI 厨房大揭秘</h2>
+        <p>如果把训练大模型比作做一道菜：</p>
+        <table class="kitchen-table">
+            <tr>
+                <th>技术环节</th>
+                <th>厨房比喻 🍳</th>
+                <th>作用</th>
+            </tr>
+            <tr>
+                <td><strong>算力 (GPU)</strong></td>
+                <td>燃气灶 / 火力</td>
+                <td>提供能量，没有它根本转不动。</td>
+            </tr>
+            <tr>
+                <td><strong>数据 (Data)</strong></td>
+                <td>食材</td>
+                <td>决定基础质量。好的食材才能做出好菜。</td>
+            </tr>
+            <tr>
+                <td><strong>算法 (Transformer)</strong></td>
+                <td>菜谱</td>
+                <td>烹饪的方法，决定怎么处理食材。</td>
+            </tr>
+            <tr>
+                <td><strong>参数 (Parameters)</strong></td>
+                <td>厨师的脑细胞</td>
+                <td>参数越多（如 700 亿），脑容量越大，越聪明。</td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+<footer>
+    <p>Generated by AI Assistant | 2024</p>
+</footer>
+
+</body>
+</html>
+

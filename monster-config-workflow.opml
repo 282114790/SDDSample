@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head>
+    <title>策划工作流程-怪物配置</title>
+  </head>
+  <body>
+    <outline text="策划工作流程-怪物配置">
+      <outline text="阶段一：挑选怪物模板">
+        <outline text="核心：class/categories检索"/>
+        <outline text="输入：玩法需求/难度定位"/>
+        <outline text="输出：.mob/.act/.ai文件"/>
+        <outline text="AI优化：快速定位模板"/>
+      </outline>
+      <outline text="阶段二：怪物分析">
+        <outline text="2a. 技能结构分析">
+          <outline text="技能列表与类型"/>
+          <outline text="动作与伤害配置关联"/>
+          <outline text="AI优化：自动生成结构报告"/>
+        </outline>
+        <outline text="2b. AI逻辑分析">
+          <outline text="行为模式与状态机"/>
+          <outline text="技能释放与移动逻辑"/>
+          <outline text="AI优化：可视化展示"/>
+        </outline>
+        <outline text="2c. 分析总结">
+          <outline text="能力概述与行为特点"/>
+          <outline text="可复用点与需调整点"/>
+        </outline>
+      </outline>
+      <outline text="阶段三：确定设计方案">
+        <outline text="3a. 修改概述">
+          <outline text="确定技能数量/类型"/>
+          <outline text="梳理修改要点"/>
+        </outline>
+        <outline text="3b. ID分配">
+          <outline text="怪物/技能/被动物ID"/>
+        </outline>
+      </outline>
+      <outline text="阶段四：设计调整">
+        <outline text="4a. 移动逻辑">
+          <outline text="模式：鲁莽/猥琐/游击/守卫"/>
+        </outline>
+        <outline text="4b. AI参数">
+          <outline text="调整积极性/范围/冷却"/>
+        </outline>
+        <outline text="4c. 基础属性">
+          <outline text="HP/攻击/速度数值"/>
+        </outline>
+      </outline>
+      <outline text="阶段五：技能调整">
+        <outline text="5a. 释放节奏">
+          <outline text="CD/优先级/触发条件"/>
+        </outline>
+        <outline text="5b. 表现效果">
+          <outline text="蓄力/出手速度/子弹数"/>
+        </outline>
+      </outline>
+      <outline text="阶段六：攻击信息调整">
+        <outline text="6a. 命中效果">
+          <outline text="击退/异常状态/受击反应"/>
+        </outline>
+        <outline text="6b. 伤害类型">
+          <outline text="物理/魔法类型配置"/>
+        </outline>
+      </outline>
+      <outline text="阶段七：回归测试">
+        <outline text="7a. 玩法回归测试">
+          <outline text="行为/技能/数值验证"/>
+          <outline text="生成测试报告"/>
+        </outline>
+      </outline>
+    </outline>
+  </body>
+</opml>
+

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM 架构：技术白皮书视角</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Highlight.js 用于代码高亮 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <!-- KaTeX 用于数学公式渲染 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+            background-color: #0d1117; /* GitHub Dark Dimmed equivalent */
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4 { color: #ffffff; }
+        
+        .font-mono { font-family: 'Fira Code', monospace; }
+
+        .tech-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+        }
+
+        .code-window {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background-color: #161b22;
+            padding: 8px 16px;
+            border-bottom: 1px solid #30363d;
+            font-size: 0.8em;
+            color: #8b949e;
+        }
+
+        /* KV Cache 动画样式 */
+        .cache-block {
+            transition: all 0.3s ease;
+        }
+        .cache-active {
+            box-shadow: 0 0 10px #2f81f7;
+            border-color: #2f81f7;
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0d1117; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+        .diagram-arrow { stroke: #8b949e; stroke-width: 2; marker-end: url(#arrowhead); }
+        .diagram-box { fill: #161b22; stroke: #30363d; stroke-width: 2; }
+        .diagram-text { fill: #c9d1d9; font-family: 'Inter'; font-size: 14px; text-anchor: middle; dominant-baseline: middle; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- 头部导航 -->
+    <header class="border-b border-gray-800 bg-[#161b22] sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 text-white p-1 rounded font-bold font-mono text-sm">ARCH</div>
+                <h1 class="text-lg font-bold">LLM 工程技术概览</h1>
+            </div>
+            <nav class="hidden md:flex space-x-6 text-sm font-medium text-gray-400">
+                <a href="#architecture" class="hover:text-white transition">架构原理 (Transformer)</a>
+                <a href="#code" class="hover:text-white transition">代码实现</a>
+                <a href="#optimization" class="hover:text-white transition">KV Cache 优化</a>
+                <a href="#alignment" class="hover:text-white transition">对齐算法 (RLHF)</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-12 space-y-20">
+
+        <!-- 1. 架构部分 -->
+        <section id="architecture" class="grid lg:grid-cols-2 gap-12">
+            <div>
+                <div class="text-blue-500 font-mono text-xs tracking-wider mb-2">01. MODEL ARCHITECTURE</div>
+                <h2 class="text-3xl font-bold mb-6">Decoder-Only Transformer 架构</h2>
+                <p class="text-gray-400 mb-6">
+                    现代主流大语言模型（如 GPT-4, Llama 3, Claude）几乎全部采用 <b>Decoder-only</b> 架构。
+                    与原始的 Encoder-Decoder 模型（Attention Is All You Need, 2017）不同，这些模型具有<b>自回归 (Autoregressive)</b> 特性，
+                    将序列的联合概率建模为条件概率的乘积：
+                </p>
+                <div class="my-6 p-4 bg-[#161b22] border border-gray-800 rounded font-mono text-sm text-center">
+                    $$ P(w_{1:T}) = \prod_{t=1}^{T} P(w_t | w_{1:t-1}) $$
+                </div>
+                
+                <h3 class="text-xl font-semibold mb-4 text-white">缩放点积注意力 (Scaled Dot-Product Attention)</h3>
+                <p class="text-gray-400 mb-4">
+                    这是驱动 Token 之间信息流动的核心机制。对于长度为 \(L\) 和嵌入维度 \(d_{model}\) 的序列：
+                </p>
+                <div class="my-6 p-4 bg-[#161b22] border border-gray-800 rounded font-mono text-sm overflow-x-auto">
+                    $$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}} + M\right)V $$
+                </div>
+                <ul class="list-disc list-inside text-gray-400 space-y-2 text-sm">
+                    <li><b>Q, K, V</b>: 输入 Embedding 的线性投影 (Linear Projections)。</li>
+                    <li><b>缩放因子 \(\sqrt{d_k}\)</b>: 防止点积数值过大导致 Softmax 进入梯度消失区域。</li>
+                    <li><b>M (Mask)</b>: 因果掩码 (Causal Mask，上三角为 \(-\infty\))，确保位置 \(t\) 无法“看到” \(>t\) 的未来信息。</li>
+                </ul>
+            </div>
+
+            <!-- 架构图 (SVG) -->
+            <div class="tech-card p-6 flex items-center justify-center">
+                <svg width="400" height="500" viewBox="0 0 400 500">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#8b949e" />
+                        </marker>
+                    </defs>
+                    
+                    <!-- Input Embedding -->
+                    <rect x="100" y="440" width="200" height="40" rx="4" class="diagram-box" />
+                    <text x="200" y="460" class="diagram-text">Token Embeddings + RoPE</text>
+                    <line x1="200" y1="440" x2="200" y2="400" class="diagram-arrow" />
+
+                    <!-- Transformer Block -->
+                    <rect x="50" y="100" width="300" height="300" rx="8" fill="none" stroke="#30363d" stroke-dasharray="5,5" />
+                    <text x="290" y="120" class="diagram-text" fill="#8b949e" font-size="12">× N Layers</text>
+
+                    <!-- RMSNorm 1 -->
+                    <rect x="120" y="360" width="160" height="30" rx="4" class="diagram-box" />
+                    <text x="200" y="375" class="diagram-text">RMSNorm</text>
+                    <line x1="200" y1="360" x2="200" y2="330" class="diagram-arrow" />
+
+                    <!-- Multi-Head Attention -->
+                    <rect x="100" y="280" width="200" height="50" rx="4" class="diagram-box" style="stroke: #3b82f6; fill: #1e293b;" />
+                    <text x="200" y="305" class="diagram-text" fill="#60a5fa">Masked Self-Attention</text>
+                    
+                    <!-- Residual Connection 1 -->
+                    <path d="M 200 400 C 50 400, 50 260, 200 260" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4" />
+                    <circle cx="200" cy="260" r="4" fill="#c9d1d9" />
+
+                    <!-- RMSNorm 2 -->
+                    <rect x="120" y="210" width="160" height="30" rx="4" class="diagram-box" />
+                    <text x="200" y="225" class="diagram-text">RMSNorm</text>
+
+                    <!-- MLP / FFN -->
+                    <rect x="100" y="140" width="200" height="50" rx="4" class="diagram-box" />
+                    <text x="200" y="165" class="diagram-text">SwiGLU FFN</text>
+
+                    <!-- Output -->
+                    <line x1="200" y1="140" x2="200" y2="100" class="diagram-arrow" />
+                    <line x1="200" y1="100" x2="200" y2="60" class="diagram-arrow" />
+                    
+                    <rect x="100" y="20" width="200" height="40" rx="4" class="diagram-box" />
+                    <text x="200" y="40" class="diagram-text">Softmax (Logits)</text>
+
+                </svg>
+            </div>
+        </section>
+
+        <!-- 2. 代码实现 -->
+        <section id="code">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <div class="text-green-500 font-mono text-xs tracking-wider mb-2">02. IMPLEMENTATION</div>
+                    <h2 class="text-3xl font-bold">PyTorch 核心实现</h2>
+                </div>
+                <div class="text-sm text-gray-500 font-mono bg-[#161b22] px-3 py-1 rounded">model.py</div>
+            </div>
+            
+            <div class="code-window">
+                <div class="code-header flex space-x-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                </div>
+                <pre><code class="language-python">import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import math
+
+class CausalSelfAttention(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        assert config.n_embd % config.n_head == 0
+        # 合并 Key, Query, Value 的线性投影层 (Linear Layer)
+        self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd)
+        # 输出投影层
+        self.c_proj = nn.Linear(config.n_embd, config.n_embd)
+        self.n_head = config.n_head
+        self.n_embd = config.n_embd
+        # 注册因果掩码 (Causal Mask) 作为 buffer，不作为可训练参数
+        # 形状为下三角矩阵，用于遮蔽未来信息
+        self.register_buffer("bias", torch.tril(torch.ones(config.block_size, config.block_size))
+                                    .view(1, 1, config.block_size, config.block_size))
+
+    def forward(self, x):
+        B, T, C = x.size() # Batch, Time(序列长度), Channels(嵌入维度)
+
+        # 计算 query, key, values
+        q, k, v = self.c_attn(x).split(self.n_embd, dim=2)
+        
+        # 变形为多头注意力 (Multi-head Attention) 格式: 
+        # (B, T, n_head, head_size) -> (B, n_head, T, head_size)
+        k = k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
+        q = q.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
+        v = v.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
+
+        # 缩放点积注意力 (Scaled Dot-Product Attention)
+        # 矩阵乘法: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
+        att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
+        
+        # 应用因果掩码 (将未来的位置填充为 -inf，使其在 Softmax 后概率为 0)
+        att = att.masked_fill(self.bias[:,:,:T,:T] == 0, float('-inf'))
+        att = F.softmax(att, dim=-1)
+        
+        # 值向量 (Value) 的加权求和
+        y = att @ v # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
+        
+        # 重新组合多头 (Reassemble heads)
+        y = y.transpose(1, 2).contiguous().view(B, T, C)
+        return self.c_proj(y)</code></pre>
+            </div>
+        </section>
+
+        <!-- 3. KV Cache 优化 (交互式) -->
+        <section id="optimization">
+            <div class="mb-8">
+                <div class="text-purple-500 font-mono text-xs tracking-wider mb-2">03. INFERENCE OPTIMIZATION</div>
+                <h2 class="text-3xl font-bold mb-4">KV Cache 推理加速可视化</h2>
+                <p class="text-gray-400 max-w-3xl">
+                    在自回归生成中，计算第 \(N\) 个 Token 的 Attention 需要 \(Q_N\)，以及所有历史的 \(K_{1...N}\) 和 \(V_{1...N}\)。
+                    如果不使用缓存，每一步都需要重新计算之前所有 Token 的 K 和 V 矩阵。
+                    <b>KV Cache</b> 技术通过在显存 (VRAM) 中驻留这些向量，将每步计算复杂度从 \(O(N^2)\) 降低到 \(O(N)\)（总复杂度 \(O(N^2)\)）。
+                </p>
+            </div>
+
+            <div class="tech-card p-8">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- 可视化区域 -->
+                    <div>
+                        <div id="token-sequence" class="flex space-x-2 mb-8 overflow-x-auto pb-2">
+                            <!-- Tokens injected by JS -->
+                        </div>
+                        
+                        <div class="border border-dashed border-gray-700 p-4 rounded bg-black/20">
+                            <h4 class="text-xs font-bold text-gray-500 mb-2 uppercase">GPU 显存 (KV Cache)</h4>
+                            <div id="kv-memory" class="grid grid-cols-6 gap-2">
+                                <!-- Memory blocks injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 控制区域 -->
+                    <div class="flex flex-col justify-center space-y-6">
+                        <div class="bg-[#0d1117] p-4 rounded border border-gray-800">
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-gray-400">当前步数 (Step):</span>
+                                <span id="step-counter" class="font-mono text-white">0</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-gray-400">计算状态 (Op):</span>
+                                <span id="compute-status" class="font-mono text-green-400">Idle</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">显存占用 (Memory):</span>
+                                <span id="mem-status" class="font-mono text-blue-400">0 MB</span>
+                            </div>
+                        </div>
+                        
+                        <button id="next-token-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium transition flex items-center justify-center space-x-2">
+                            <span>生成下一个 Token</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                        
+                        <button id="reset-btn" class="w-full py-2 bg-transparent border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white rounded text-sm transition">
+                            重置序列 (Reset)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 对齐与训练 -->
+        <section id="alignment" class="pb-20">
+            <div class="text-orange-500 font-mono text-xs tracking-wider mb-2">04. ALIGNMENT PIPELINE</div>
+            <h2 class="text-3xl font-bold mb-8">RLHF (基于人类反馈的强化学习)</h2>
+            
+            <div class="grid md:grid-cols-3 gap-6 text-sm">
+                <!-- Step 1 -->
+                <div class="tech-card p-6">
+                    <div class="font-bold text-white mb-2">1. SFT (有监督微调)</div>
+                    <p class="text-gray-400 mb-4">在高质量的“指令-回复”对数据上微调预训练模型，学习指令遵循能力。</p>
+                    <div class="bg-black/30 p-2 rounded font-mono text-xs text-gray-500">
+                        Loss = -log(P(response|prompt))
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="tech-card p-6">
+                    <div class="font-bold text-white mb-2">2. Reward Modeling (RM)</div>
+                    <p class="text-gray-400 mb-4">训练一个独立的标量模型（Reward Model）来预测人类偏好，为生成的回答打分。</p>
+                    <div class="bg-black/30 p-2 rounded font-mono text-xs text-gray-500">
+                        Loss = -log(σ(r(yw) - r(yl)))
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="tech-card p-6 border-blue-900/50 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-blue-900/5 pointer-events-none"></div>
+                    <div class="font-bold text-blue-200 mb-2">3. PPO / DPO</div>
+                    <p class="text-gray-400 mb-4">使用强化学习优化策略 \(\pi\)，在最大化奖励的同时，通过 KL 散度约束防止偏离原模型。</p>
+                    <div class="bg-black/30 p-2 rounded font-mono text-xs text-gray-500">
+                        max E[r(x,y) - β log(π/π_ref)]
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+            hljs.highlightAll();
+        });
+
+        // --- KV Cache 演示逻辑 ---
+        const tokens = ["The", "quick", "brown", "fox", "jumps", "over", "lazy", "dog"];
+        let currentStep = 0;
+        
+        const container = document.getElementById('token-sequence');
+        const memContainer = document.getElementById('kv-memory');
+        const statusEl = document.getElementById('compute-status');
+        const memEl = document.getElementById('mem-status');
+        const stepEl = document.getElementById('step-counter');
+
+        function render() {
+            // 渲染 Tokens
+            container.innerHTML = '';
+            tokens.forEach((t, i) => {
+                if (i < currentStep) {
+                    const el = document.createElement('div');
+                    el.className = 'px-3 py-1 bg-blue-900/30 border border-blue-800 text-blue-200 rounded text-sm font-mono';
+                    el.innerText = t;
+                    container.appendChild(el);
+                }
+            });
+
+            // 渲染内存块
+            memContainer.innerHTML = '';
+            for (let i = 0; i < 12; i++) { // 演示用 12 个槽位
+                const el = document.createElement('div');
+                if (i < currentStep) {
+                    el.className = 'h-8 bg-purple-900/50 border border-purple-600 rounded flex items-center justify-center text-[10px] text-purple-200';
+                    el.innerHTML = `K${i}V${i}`;
+                } else {
+                    el.className = 'h-8 bg-[#0d1117] border border-gray-800 border-dashed rounded opacity-30';
+                }
+                memContainer.appendChild(el);
+            }
+
+            stepEl.innerText = currentStep;
+            memEl.innerText = `${currentStep * 2 * 128 * 4 / 1024} KB (模拟值)`; // 虚拟计算
+        }
+
+        document.getElementById('next-token-btn').addEventListener('click', () => {
+            if (currentStep >= tokens.length) return;
+            
+            // 动画序列
+            const btn = document.getElementById('next-token-btn');
+            btn.disabled = true;
+            statusEl.innerText = `计算 Q 向量: "${tokens[currentStep]}"`;
+            statusEl.className = "font-mono text-yellow-400";
+
+            setTimeout(() => {
+                statusEl.innerText = "读取 KV Cache (Attention)";
+                
+                // 高亮显存区域
+                memContainer.classList.add('animate-pulse');
+                
+                setTimeout(() => {
+                    statusEl.innerText = "写入新 KV 对";
+                    currentStep++;
+                    render();
+                    memContainer.classList.remove('animate-pulse');
+                    statusEl.innerText = "空闲 (Idle)";
+                    statusEl.className = "font-mono text-green-400";
+                    btn.disabled = false;
+                }, 600);
+            }, 600);
+        });
+
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            currentStep = 0;
+            render();
+        });
+
+        render();
+    </script>
+</body>
+</html>

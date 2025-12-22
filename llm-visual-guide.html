@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小白也能看懂：大语言模型(LLM)原理图解</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f0fdf4; /* Light green tint */
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .highlight-box {
+            background-color: #dbeafe;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 2px 6px;
+            display: inline-block;
+        }
+
+        /* 动画相关 */
+        .probability-bar {
+            transition: width 1s ease-in-out;
+        }
+
+        .neuron-dot {
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; r: 4; }
+            50% { opacity: 1; r: 6; }
+            100% { opacity: 0.4; r: 4; }
+        }
+
+        .connection-line {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: dash 3s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: 0; }
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <!-- 头部 -->
+    <header class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-12 px-4 shadow-lg">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">大模型不是魔法，是统计学的奇迹</h1>
+            <p class="text-xl opacity-90">用最直观的方式，拆解 ChatGPT 等 AI 背后的秘密</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8 space-y-12">
+
+        <!-- 第一部分：核心原理 -->
+        <section>
+            <div class="flex items-center space-x-3 mb-6">
+                <span class="bg-emerald-100 text-emerald-800 text-2xl font-bold w-12 h-12 flex items-center justify-center rounded-full">1</span>
+                <h2 class="text-3xl font-bold text-slate-800">核心本质：超级文字接龙</h2>
+            </div>
+            
+            <div class="card p-8">
+                <p class="text-lg leading-relaxed mb-6">
+                    想象一下，如果让你玩一个<b>"成语接龙"</b>游戏，我说"一心一..."，你大概率会接"意"。
+                    <br><br>
+                    大模型本质上就是一台<b>"超级算命机"</b>。它并不像人类那样真正"理解"意思，它是根据读过的万亿字书，<b>计算下一个字出现的概率</b>。
+                </p>
+
+                <!-- 交互演示区域 -->
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-lg mb-4 text-center">🔮 概率预测演示</h3>
+                    <div class="text-center text-2xl mb-6 font-mono bg-white p-4 rounded shadow-inner">
+                        今天天气真 <span id="target-word" class="text-emerald-600 font-bold">?</span>
+                    </div>
+
+                    <div class="space-y-3 max-w-md mx-auto">
+                        <!-- 选项 A -->
+                        <div class="relative pt-1">
+                            <div class="flex mb-2 items-center justify-between">
+                                <span class="text-sm font-semibold inline-block py-1 px-2 uppercase rounded-full text-emerald-600 bg-emerald-200">
+                                    好 (Probability: 85%)
+                                </span>
+                            </div>
+                            <div class="overflow-hidden h-4 mb-4 text-xs flex rounded bg-emerald-100">
+                                <div style="width: 85%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-emerald-500 probability-bar"></div>
+                            </div>
+                        </div>
+
+                        <!-- 选项 B -->
+                        <div class="relative pt-1">
+                            <div class="flex mb-2 items-center justify-between">
+                                <span class="text-sm font-semibold inline-block py-1 px-2 uppercase rounded-full text-slate-600 bg-slate-200">
+                                    冷 (Probability: 10%)
+                                </span>
+                            </div>
+                            <div class="overflow-hidden h-4 mb-4 text-xs flex rounded bg-slate-100">
+                                <div style="width: 10%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-slate-400 probability-bar"></div>
+                            </div>
+                        </div>
+
+                        <!-- 选项 C -->
+                        <div class="relative pt-1">
+                            <div class="flex mb-2 items-center justify-between">
+                                <span class="text-sm font-semibold inline-block py-1 px-2 uppercase rounded-full text-slate-600 bg-slate-200">
+                                    西瓜 (Probability: 0.001%)
+                                </span>
+                            </div>
+                            <div class="overflow-hidden h-4 mb-4 text-xs flex rounded bg-slate-100">
+                                <div style="width: 1%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-slate-300 probability-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-sm text-center text-slate-500 mt-4">AI 选择了概率最高的"好"，然后把它变成下一次输入的历史，继续猜下一个字。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第二部分：关键技术 -->
+        <section>
+            <div class="flex items-center space-x-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-800 text-2xl font-bold w-12 h-12 flex items-center justify-center rounded-full">2</span>
+                <h2 class="text-3xl font-bold text-slate-800">关键技术：注意力机制 (Attention)</h2>
+            </div>
+
+            <div class="card p-8">
+                <p class="text-lg leading-relaxed mb-6">
+                    为什么 AI 说话能逻辑通顺？因为它有<b>"聚光灯"</b>能力。
+                    <br>
+                    当它在处理一句话时，它能知道哪些词之间关系最紧密，就像人类阅读时会划重点一样。
+                </p>
+
+                <!-- SVG 可视化 -->
+                <div class="flex flex-col items-center justify-center bg-slate-900 rounded-xl p-8 text-white">
+                    <p class="mb-4 text-slate-400 text-sm">示例句子："我想吃<span class="text-yellow-400">苹果</span>，因为<span class="text-yellow-400">它</span>很甜。"</p>
+                    
+                    <svg width="100%" height="150" viewBox="0 0 400 150" class="max-w-md">
+                        <!-- Words -->
+                        <text x="50" y="40" fill="white" text-anchor="middle">苹果</text>
+                        <text x="350" y="40" fill="white" text-anchor="middle">它</text>
+                        <text x="200" y="40" fill="#666" text-anchor="middle">...</text>
+
+                        <!-- Curves representing attention -->
+                        <path d="M 50 50 Q 200 120 350 50" stroke="#fbbf24" stroke-width="4" fill="none" class="connection-line"/>
+                        
+                        <!-- Glow effect -->
+                        <circle cx="50" cy="40" r="20" fill="white" opacity="0.1" />
+                        <circle cx="350" cy="40" r="20" fill="white" opacity="0.1" />
+                    </svg>
+
+                    <p class="text-center mt-2 text-yellow-200">
+                        当 AI 看到"它"这个字时，它的注意力强烈地连接到了"苹果"，<br>而不是前面的"我想"。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第三部分：训练过程 -->
+        <section>
+            <div class="flex items-center space-x-3 mb-6">
+                <span class="bg-rose-100 text-rose-800 text-2xl font-bold w-12 h-12 flex items-center justify-center rounded-full">3</span>
+                <h2 class="text-3xl font-bold text-slate-800">养成记：从文盲到博士的三个阶段</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- 阶段 1 -->
+                <div class="card p-6 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-3xl mb-4">📚</div>
+                    <h3 class="font-bold text-xl mb-2">1. 预训练 (Pre-training)</h3>
+                    <p class="text-sm text-slate-500 font-bold uppercase mb-2">通读万卷书</p>
+                    <p class="text-slate-600">
+                        AI 被关在图书馆里，读完了互联网上几乎所有的文字。
+                        <br><br>
+                        <span class="text-blue-600 bg-blue-50 px-2 py-1 rounded text-sm">结果：</span> 
+                        它学会了语法和知识，但说话像个复读机，不知道怎么回答问题。
+                    </p>
+                </div>
+
+                <!-- 阶段 2 -->
+                <div class="card p-6 flex flex-col items-center text-center relative overflow-hidden">
+                    <!-- Arrow -->
+                    <div class="hidden md:block absolute -left-4 top-1/2 transform -translate-y-1/2 text-slate-300 text-2xl">➔</div>
+                    
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-3xl mb-4">📝</div>
+                    <h3 class="font-bold text-xl mb-2">2. 指令微调 (SFT)</h3>
+                    <p class="text-sm text-slate-500 font-bold uppercase mb-2">做模拟试卷</p>
+                    <p class="text-slate-600">
+                        老师给它一堆"问题+标准答案"的试卷，教它怎么通过对话来解决任务。
+                        <br><br>
+                        <span class="text-purple-600 bg-purple-50 px-2 py-1 rounded text-sm">结果：</span>
+                        它学会了听懂指令，能翻译、写代码、写诗了。
+                    </p>
+                </div>
+
+                <!-- 阶段 3 -->
+                <div class="card p-6 flex flex-col items-center text-center relative">
+                    <!-- Arrow -->
+                    <div class="hidden md:block absolute -left-4 top-1/2 transform -translate-y-1/2 text-slate-300 text-2xl">➔</div>
+
+                    <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-3xl mb-4">👍</div>
+                    <h3 class="font-bold text-xl mb-2">3. 人类反馈 (RLHF)</h3>
+                    <p class="text-sm text-slate-500 font-bold uppercase mb-2">学礼貌规矩</p>
+                    <p class="text-slate-600">
+                        人类老师对它的回答进行打分（点赞或点踩）。就像训练小狗一样，奖励好的行为。
+                        <br><br>
+                        <span class="text-orange-600 bg-orange-50 px-2 py-1 rounded text-sm">结果：</span>
+                        它变得更符合人类价值观，更安全，不乱说脏话。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 总结 -->
+        <footer class="bg-slate-800 text-slate-300 p-8 rounded-2xl text-center mt-12">
+            <h3 class="text-2xl text-white font-bold mb-4">总结一下</h3>
+            <p class="max-w-2xl mx-auto">
+                目前的 AI 其实并不具备真正的"意识"或"灵魂"。
+                <br>
+                它只是一个读过全世界的书，拥有超级记忆力，并且极度擅长<b>"通过上文猜下文"</b>的数学模型。
+                <br>
+                它的"智能"，涌现自海量的数据和精妙的算法结构。
+            </p>
+        </footer>
+
+    </main>
+
+    <script>
+        // 简单的交互逻辑：点击概率条模拟选择
+        document.querySelectorAll('.probability-bar').forEach(bar => {
+            bar.parentElement.parentElement.style.cursor = 'pointer';
+            bar.parentElement.parentElement.addEventListener('click', function() {
+                const text = this.querySelector('span').innerText.split(' ')[0];
+                const target = document.getElementById('target-word');
+                target.innerText = text;
+                target.style.color = '#3b82f6';
+                
+                // 重置动画效果
+                target.style.transform = 'scale(1.5)';
+                setTimeout(() => target.style.transform = 'scale(1)', 200);
+            });
+        });
+    </script>
+</body>
+</html>

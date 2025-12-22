@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 技术全景思维导图 2024-2025</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: auto;
+        }
+        
+        header {
+            padding: 30px 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 500;
+            background: linear-gradient(90deg, #00d4ff, #7b2ff7, #f72585);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1rem;
+        }
+        
+        .mindmap-container {
+            padding: 40px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #7b2ff7, #f72585);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+        
+        .branches {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .branch {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 3px solid;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .branch:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .branch-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .branch-title::before {
+            content: "▸";
+            opacity: 0.5;
+        }
+        
+        .items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.2s;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            transform: scale(1.02);
+        }
+        
+        .item:active {
+            transform: scale(0.98);
+        }
+        
+        .item.highlight {
+            background: linear-gradient(135deg, rgba(123, 47, 247, 0.3), rgba(247, 37, 133, 0.3));
+            border: 1px solid rgba(247, 37, 133, 0.5);
+            font-weight: 500;
+        }
+        
+        .item .note {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-left: 4px;
+        }
+        
+        /* Color schemes for sections */
+        .section:nth-child(1) .branch { border-color: #f72585; }
+        .section:nth-child(2) .branch { border-color: #7b2ff7; }
+        .section:nth-child(3) .branch { border-color: #3a0ca3; }
+        .section:nth-child(4) .branch { border-color: #4361ee; }
+        .section:nth-child(5) .branch { border-color: #4895ef; }
+        .section:nth-child(6) .branch { border-color: #4cc9f0; }
+        .section:nth-child(7) .branch { border-color: #00d4ff; }
+        .section:nth-child(8) .branch { border-color: #06d6a0; }
+        .section:nth-child(9) .branch { border-color: #ffd166; }
+        .section:nth-child(10) .branch { border-color: #ef476f; }
+        .section:nth-child(11) .branch { border-color: #118ab2; }
+        
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 300px;
+        }
+        
+        .legend-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        .toc {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+        
+        .toc a {
+            display: block;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .toc a:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 1200px) {
+            .toc { display: none; }
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: linear-gradient(145deg, #1a1a3e, #0f0f23);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            overflow: hidden;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+        
+        .modal-header {
+            padding: 25px 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, #00d4ff, #7b2ff7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .modal-subtitle {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 5px;
+        }
+        
+        .modal-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background: rgba(247, 37, 133, 0.3);
+            color: #fff;
+        }
+        
+        .modal-body {
+            padding: 25px 30px;
+            overflow-y: auto;
+            max-height: calc(85vh - 100px);
+        }
+        
+        .modal-section {
+            margin-bottom: 20px;
+        }
+        
+        .modal-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .modal-section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .modal-section-title::before {
+            content: "";
+            width: 3px;
+            height: 12px;
+            background: linear-gradient(180deg, #7b2ff7, #f72585);
+            border-radius: 2px;
+        }
+        
+        .modal-text {
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+        
+        .modal-text strong {
+            color: #00d4ff;
+            font-weight: 500;
+        }
+        
+        .modal-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .modal-list li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .modal-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .modal-list li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #7b2ff7;
+        }
+        
+        .modal-code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #4cc9f0;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .modal-tag {
+            background: rgba(123, 47, 247, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(123, 47, 247, 0.3);
+        }
+        
+        .modal-highlight {
+            background: linear-gradient(90deg, rgba(123, 47, 247, 0.2), rgba(247, 37, 133, 0.2));
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 3px solid #f72585;
+            margin: 15px 0;
+        }
+        
+        .modal-highlight p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+        }
+        
+        /* Scrollbar for modal */
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .modal-body::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+        
+        .modal-body::-webkit-scrollbar-thumb {
+            background: rgba(123, 47, 247, 0.5);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🧠 AI 技术全景思维导图</h1>
+        <p class="subtitle">2024-2025 · 从基础模型到前沿研究的完整知识体系</p>
+    </header>
+    
+    <nav class="toc">
+        <a href="#s1">一、基础模型</a>
+        <a href="#s2">二、推理策略</a>
+        <a href="#s3">三、AI Agent</a>
+        <a href="#s4">四、开发框架</a>
+        <a href="#s5">五、RAG知识增强</a>
+        <a href="#s6">六、模型优化</a>
+        <a href="#s7">七、推理部署</a>
+        <a href="#s8">八、AI编程助手</a>
+        <a href="#s9">九、评估与安全</a>
+        <a href="#s10">十、前沿研究</a>
+        <a href="#s11">十一、生态社区</a>
+    </nav>
+    
+    <div class="mindmap-container">
+        <!-- Section 1: 基础模型 -->
+        <div class="section" id="s1">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2 class="section-title">基础模型层 Foundation Models</h2>
+            </div>
+            <div class="branches">
+                <div class="branch">
+                    <div class="branch-title">大语言模型 LLMs - 闭源</div>
+                    <div class="items">
+                        <span class="item highlight">GPT-4 / GPT-4o <span class="note">OpenAI</span></span>
+                        <span class="item highlight">Claude 3.5 <span class="note">Anthropic</span></span>
+                        <span class="item">Gemini Pro/Ultra <span class="note">Google</span></span>
+                        <span class="item">文心一言 <span class="note">百度</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">大语言模型 LLMs - 开源</div>
+                    <div class="items">
+                        <span class="item highlight">LLaMA 3 <span class="note">Meta</span></span>
+                        <span class="item">Mistral / Mixtral</span>
+                        <span class="item">Qwen 通义千问 <span class="note">阿里</span></span>
+                        <span class="item">DeepSeek</span>
+                        <span class="item">Yi <span class="note">零一万物</span></span>
+                        <span class="item">GLM <span class="note">智谱</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">多模态 - 视觉语言</div>
+                    <div class="items">
+                        <span class="item">GPT-4V / GPT-4o</span>
+                        <span class="item">Claude 3 Vision</span>
+                        <span class="item">Gemini Pro Vision</span>
+                        <span class="item">LLaVA <span class="note">开源</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">多模态 - 图像/视频生成</div>
+                    <div class="items">
+                        <span class="item highlight">DALL-E 3</span>
+                        <span class="item highlight">Midjourney</span>
+                        <span class="item highlight">Stable Diffusion <span class="note">开源</span></span>
+                        <span class="item">Flux</span>
+                        <span class="item highlight">Sora <span class="note">视频</span></span>
+                        <span class="item">Runway Gen-3</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">多模态 - 语音</div>
+                    <div class="items">
+                        <span class="item">Whisper <span class="note">语音识别</span></span>
+                        <span class="item">TTS <span class="note">语音合成</span></span>
+                        <span class="item">Bark</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 2: 推理策略 -->
+        <div class="section" id="s2">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2 class="section-title">推理策略层 Reasoning Strategies</h2>
+            </div>
+            <div class="branches">
+                <div class="branch">
+                    <div class="branch-title">Prompting 技术</div>
+                    <div class="items">
+                        <span class="item">Zero-shot <span class="note">零样本</span></span>
+                        <span class="item">Few-shot <span class="note">少样本</span></span>
+                        <span class="item highlight">CoT Chain of Thought <span class="note">思维链</span></span>
+                        <span class="item highlight">ToT Tree of Thought <span class="note">思维树</span></span>
+                        <span class="item">GoT Graph of Thought <span class="note">思维图</span></span>
+                        <span class="item">Self-Consistency <span class="note">自洽性</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">Agent 推理模式</div>
+                    <div class="items">
+                        <span class="item highlight">ReAct <span class="note">推理+行动</span></span>
+                        <span class="item">Plan-and-Execute <span class="note">规划执行</span></span>
+                        <span class="item">Reflexion <span class="note">反思</span></span>
+                        <span class="item">REWOO</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">深度推理</div>
+                    <div class="items">
+                        <span class="item highlight">o1 / o3 Reasoning <span class="note">OpenAI</span></span>
+                        <span class="item">Test-Time Compute</span>
+                        <span class="item">MCTS <span class="note">蒙特卡洛树搜索</span></span>
+                        <span class="item">Self-Reflection</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 3: AI Agent -->
+        <div class="section" id="s3">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2 class="section-title">AI Agent 智能体</h2>
+            </div>
+            <div class="branches">
+                <div class="branch">
+                    <div class="branch-title">Agent 架构模式</div>
+                    <div class="items">
+                        <span class="item highlight">ReAct Agent</span>
+                        <span class="item">Plan-and-Execute Agent</span>
+                        <span class="item highlight">Multi-Agent <span class="note">多智能体</span></span>
+                        <span class="item">Hierarchical Agent</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">核心能力组件</div>
+                    <div class="items">
+                        <span class="item highlight">Tool Use <span class="note">工具调用</span></span>
+                        <span class="item highlight">Function Calling</span>
+                        <span class="item">Memory <span class="note">短期/长期记忆</span></span>
+                        <span class="item">Planning <span class="note">任务规划</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">知名 Agent 项目</div>
+                    <div class="items">
+                        <span class="item highlight">AutoGPT</span>
+                        <span class="item">BabyAGI</span>
+                        <span class="item">MetaGPT</span>
+                        <span class="item highlight">CrewAI</span>
+                        <span class="item highlight">AutoGen <span class="note">Microsoft</span></span>
+                        <span class="item">OpenAI Assistants API</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 4: 开发框架 -->
+        <div class="section" id="s4">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2 class="section-title">开发框架层 Frameworks & Tools</h2>
+            </div>
+            <div class="branches">
+                <div class="branch">
+                    <div class="branch-title">综合开发框架</div>
+                    <div class="items">
+                        <span class="item highlight">LangChain <span class="note">最流行</span></span>
+                        <span class="item highlight">LlamaIndex <span class="note">数据检索</span></span>
+                        <span class="item">Semantic Kernel <span class="note">Microsoft</span></span>
+                        <span class="item">Haystack</span>
+                        <span class="item">Dify <span class="note">低代码</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">Agent 专用框架</div>
+                    <div class="items">
+                        <span class="item highlight">LangGraph</span>
+                        <span class="item">CrewAI</span>
+                        <span class="item">AutoGen</span>
+                        <span class="item">Agno <span class="note">原Phidata</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">Prompt 工程工具</div>
+                    <div class="items">
+                        <span class="item">PromptFlow <span class="note">Azure</span></span>
+                        <span class="item">Guidance</span>
+                        <span class="item">LMQL</span>
+                        <span class="item">Outlines</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 5: RAG -->
+        <div class="section" id="s5">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <h2 class="section-title">RAG 知识增强 Retrieval Augmented Generation</h2>
+            </div>
+            <div class="branches">
+                <div class="branch">
+                    <div class="branch-title">核心概念</div>
+                    <div class="items">
+                        <span class="item highlight">RAG <span class="note">检索增强生成</span></span>
+                        <span class="item highlight">Embedding <span class="note">向量嵌入</span></span>
+                        <span class="item">Chunking <span class="note">文档分块</span></span>
+                        <span class="item">Reranking <span class="note">重排序</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">向量数据库</div>
+                    <div class="items">
+                        <span class="item">Pinecone <span class="note">托管</span></span>
+                        <span class="item">Weaviate</span>
+                        <span class="item">Milvus</span>
+                        <span class="item highlight">Chroma <span class="note">轻量</span></span>
+                        <span class="item">Qdrant</span>
+                        <span class="item">FAISS <span class="note">Meta</span></span>
+                        <span class="item">pgvector</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">Embedding 模型</div>
+                    <div class="items">
+                        <span class="item">OpenAI Embeddings</span>
+                        <span class="item">Cohere Embed</span>
+                        <span class="item highlight">BGE <span class="note">中文最佳</span></span>
+                        <span class="item">Sentence Transformers</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">高级 RAG 技术</div>
+                    <div class="items">
+                        <span class="item">Hybrid Search <span class="note">混合检索</span></span>
+                        <span class="item">HyDE</span>
+                        <span class="item">Self-RAG</span>
+                        <span class="item highlight">GraphRAG <span class="note">图结构</span></span>
+                        <span class="item">Agentic RAG</span>
+                        <span class="item">Corrective RAG</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 6: 模型优化 -->
+        <div class="section" id="s6">
+            <div class="section-header">
+                <div class="section-number">6</div>
+                <h2 class="section-title">模型优化 Fine-tuning & Optimization</h2>
+            </div>
+            <div class="branches">
+                <div class="branch">
+                    <div class="branch-title">微调方法</div>
+                    <div class="items">
+                        <span class="item">Full Fine-tuning</span>
+                        <span class="item highlight">LoRA <span class="note">最流行</span></span>
+                        <span class="item highlight">QLoRA <span class="note">显存友好</span></span>
+                        <span class="item">Prefix Tuning</span>
+                        <span class="item">P-Tuning</span>
+                        <span class="item">Adapter</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">训练技术</div>
+                    <div class="items">
+                        <span class="item">SFT <span class="note">监督微调</span></span>
+                        <span class="item highlight">RLHF <span class="note">人类反馈强化学习</span></span>
+                        <span class="item highlight">DPO <span class="note">直接偏好优化</span></span>
+                        <span class="item">PPO</span>
+                        <span class="item">Constitutional AI</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">量化与压缩</div>
+                    <div class="items">
+                        <span class="item">GPTQ</span>
+                        <span class="item">AWQ</span>
+                        <span class="item highlight">GGUF / GGML</span>
+                        <span class="item">bitsandbytes</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">微调工具</div>
+                    <div class="items">
+                        <span class="item highlight">HuggingFace PEFT</span>
+                        <span class="item">Axolotl</span>
+                        <span class="item highlight">LLaMA-Factory</span>
+                        <span class="item">Unsloth</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 7: 推理部署 -->
+        <div class="section" id="s7">
+            <div class="section-header">
+                <div class="section-number">7</div>
+                <h2 class="section-title">推理与部署 Inference & Deployment</h2>
+            </div>
+            <div class="branches">
+                <div class="branch">
+                    <div class="branch-title">推理引擎</div>
+                    <div class="items">
+                        <span class="item highlight">vLLM <span class="note">高吞吐</span></span>
+                        <span class="item">TensorRT-LLM <span class="note">NVIDIA</span></span>
+                        <span class="item highlight">llama.cpp <span class="note">本地推理</span></span>
+                        <span class="item highlight">Ollama <span class="note">本地管理</span></span>
+                        <span class="item">LM Studio</span>
+                        <span class="item">TGI <span class="note">HuggingFace</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">部署平台</div>
+                    <div class="items">
+                        <span class="item">HuggingFace Inference</span>
+                        <span class="item">Replicate</span>
+                        <span class="item">Modal</span>
+                        <span class="item">Together AI</span>
+                        <span class="item">Anyscale</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 8: AI编程助手 -->
+        <div class="section" id="s8">
+            <div class="section-header">
+                <div class="section-number">8</div>
+                <h2 class="section-title">AI 编程助手 AI-Assisted Development</h2>
+            </div>
+            <div class="branches">
+                <div class="branch">
+                    <div class="branch-title">IDE 集成工具</div>
+                    <div class="items">
+                        <span class="item highlight">GitHub Copilot</span>
+                        <span class="item highlight">Cursor <span class="note">AI-first IDE</span></span>
+                        <span class="item">Windsurf <span class="note">Codeium</span></span>
+                        <span class="item">Cody <span class="note">Sourcegraph</span></span>
+                        <span class="item">CodeWhisperer <span class="note">AWS</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">代码 Agent</div>
+                    <div class="items">
+                        <span class="item highlight">Devin <span class="note">AI工程师</span></span>
+                        <span class="item">OpenHands <span class="note">开源Devin</span></span>
+                        <span class="item">Aider</span>
+                        <span class="item">GPT Engineer</span>
+                        <span class="item">Sweep</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">开发方法论</div>
+                    <div class="items">
+                        <span class="item highlight">SDD <span class="note">Spec-Driven Dev</span></span>
+                        <span class="item">TDD with AI</span>
+                        <span class="item">Vibe Coding</span>
+                        <span class="item highlight">Prompt Engineering</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 9: 评估与安全 -->
+        <div class="section" id="s9">
+            <div class="section-header">
+                <div class="section-number">9</div>
+                <h2 class="section-title">评估与安全 Evaluation & Safety</h2>
+            </div>
+            <div class="branches">
+                <div class="branch">
+                    <div class="branch-title">评估基准</div>
+                    <div class="items">
+                        <span class="item">MMLU</span>
+                        <span class="item">HumanEval <span class="note">代码</span></span>
+                        <span class="item">GSM8K <span class="note">数学</span></span>
+                        <span class="item">MT-Bench</span>
+                        <span class="item highlight">LMSYS Arena</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">可观测性工具</div>
+                    <div class="items">
+                        <span class="item highlight">LangSmith</span>
+                        <span class="item">Weights & Biases</span>
+                        <span class="item">Arize Phoenix</span>
+                        <span class="item">Ragas <span class="note">RAG评估</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">AI 安全概念</div>
+                    <div class="items">
+                        <span class="item highlight">Alignment <span class="note">对齐</span></span>
+                        <span class="item highlight">Guardrails <span class="note">护栏</span></span>
+                        <span class="item">Red Teaming</span>
+                        <span class="item">Jailbreaking</span>
+                        <span class="item">Prompt Injection</span>
+                        <span class="item highlight">Hallucination <span class="note">幻觉</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">安全工具</div>
+                    <div class="items">
+                        <span class="item">NeMo Guardrails</span>
+                        <span class="item">Guardrails AI</span>
+                        <span class="item">LLM Guard</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 10: 前沿研究 -->
+        <div class="section" id="s10">
+            <div class="section-header">
+                <div class="section-number">10</div>
+                <h2 class="section-title">前沿研究 Cutting Edge Research</h2>
+            </div>
+            <div class="branches">
+                <div class="branch">
+                    <div class="branch-title">架构创新</div>
+                    <div class="items">
+                        <span class="item highlight">MoE <span class="note">专家混合</span></span>
+                        <span class="item highlight">Mamba / SSM <span class="note">状态空间</span></span>
+                        <span class="item">RWKV</span>
+                        <span class="item">Hyena</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">能力扩展</div>
+                    <div class="items">
+                        <span class="item highlight">Long Context <span class="note">100K+ tokens</span></span>
+                        <span class="item">Multimodal Reasoning</span>
+                        <span class="item">World Models</span>
+                        <span class="item">Embodied AI <span class="note">具身智能</span></span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">新范式</div>
+                    <div class="items">
+                        <span class="item highlight">Test-Time Compute</span>
+                        <span class="item">Synthetic Data <span class="note">合成数据</span></span>
+                        <span class="item">Self-Play</span>
+                        <span class="item">Model Merging</span>
+                        <span class="item highlight">Compound AI Systems</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 11: 生态社区 -->
+        <div class="section" id="s11">
+            <div class="section-header">
+                <div class="section-number">11</div>
+                <h2 class="section-title">生态与社区 Ecosystem & Community</h2>
+            </div>
+            <div class="branches">
+                <div class="branch">
+                    <div class="branch-title">模型与数据平台</div>
+                    <div class="items">
+                        <span class="item highlight">Hugging Face</span>
+                        <span class="item">ModelScope 魔搭 <span class="note">阿里</span></span>
+                        <span class="item">Kaggle</span>
+                        <span class="item">Papers with Code</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">学习资源</div>
+                    <div class="items">
+                        <span class="item highlight">Andrej Karpathy</span>
+                        <span class="item">fast.ai</span>
+                        <span class="item highlight">DeepLearning.AI</span>
+                        <span class="item">LangChain Academy</span>
+                    </div>
+                </div>
+                <div class="branch">
+                    <div class="branch-title">信息来源</div>
+                    <div class="items">
+                        <span class="item highlight">arXiv</span>
+                        <span class="item">Twitter/X AI社区</span>
+                        <span class="item">The Batch <span class="note">Andrew Ng</span></span>
+                        <span class="item">Discord/Slack社区</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="legend">
+        <div class="legend-title">📌 学习优先级说明</div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background: linear-gradient(135deg, rgba(123, 47, 247, 0.5), rgba(247, 37, 133, 0.5));"></div>
+            <span>高亮项 = 核心必学概念</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background: rgba(255, 255, 255, 0.1);"></div>
+            <span>普通项 = 进阶/可选学习</span>
+        </div>
+        <div style="margin-top: 12px; font-size: 0.75rem; color: rgba(255,255,255,0.4);">
+            💡 点击概念查看详情
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title" id="modal-title">概念名称</h3>
+                    <p class="modal-subtitle" id="modal-subtitle">英文名 · 分类</p>
+                </div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="ai-concepts-data.js"></script>
+    <script>
+        // 点击事件绑定
+        document.querySelectorAll('.item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const text = this.childNodes[0].textContent.trim();
+                showConceptInfo(text);
+            });
+        });
+        
+        // 显示概念信息
+        function showConceptInfo(conceptName) {
+            const concept = findConcept(conceptName);
+            if (!concept) {
+                showDefaultInfo(conceptName);
+                return;
+            }
+            
+            document.getElementById('modal-title').textContent = concept.name;
+            document.getElementById('modal-subtitle').textContent = 
+                (concept.english ? concept.english + ' · ' : '') + (concept.category || '');
+            
+            let bodyHTML = '';
+            
+            // 简介
+            if (concept.summary) {
+                bodyHTML += `
+                    <div class="modal-section">
+                        <div class="modal-section-title">简介</div>
+                        <p class="modal-text">${concept.summary}</p>
+                    </div>
+                `;
+            }
+            
+            // 核心要点
+            if (concept.highlight) {
+                bodyHTML += `
+                    <div class="modal-highlight">
+                        <p>💡 ${concept.highlight}</p>
+                    </div>
+                `;
+            }
+            
+            // 原理/工作方式
+            if (concept.principle) {
+                bodyHTML += `
+                    <div class="modal-section">
+                        <div class="modal-section-title">核心原理</div>
+                        <p class="modal-text">${concept.principle}</p>
+                    </div>
+                `;
+            }
+            
+            // 特点/优势
+            if (concept.features && concept.features.length > 0) {
+                bodyHTML += `
+                    <div class="modal-section">
+                        <div class="modal-section-title">主要特点</div>
+                        <ul class="modal-list">
+                            ${concept.features.map(f => `<li>${f}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            // 应用场景
+            if (concept.useCases && concept.useCases.length > 0) {
+                bodyHTML += `
+                    <div class="modal-section">
+                        <div class="modal-section-title">应用场景</div>
+                        <ul class="modal-list">
+                            ${concept.useCases.map(u => `<li>${u}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            // 代码示例
+            if (concept.code) {
+                bodyHTML += `
+                    <div class="modal-section">
+                        <div class="modal-section-title">示例</div>
+                        <pre class="modal-code">${concept.code}</pre>
+                    </div>
+                `;
+            }
+            
+            // 相关技术标签
+            if (concept.tags && concept.tags.length > 0) {
+                bodyHTML += `
+                    <div class="modal-tags">
+                        ${concept.tags.map(t => `<span class="modal-tag">${t}</span>`).join('')}
+                    </div>
+                `;
+            }
+            
+            document.getElementById('modal-body').innerHTML = bodyHTML;
+            document.getElementById('modal').classList.add('active');
+        }
+        
+        // 查找概念
+        function findConcept(name) {
+            const normalizedName = name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, '');
+            for (const key in conceptsDB) {
+                const concept = conceptsDB[key];
+                const keys = [key, concept.name, concept.english, ...(concept.aliases || [])];
+                for (const k of keys) {
+                    if (k && k.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, '') === normalizedName) {
+                        return concept;
+                    }
+                }
+            }
+            // 模糊匹配
+            for (const key in conceptsDB) {
+                if (normalizedName.includes(key.toLowerCase()) || key.toLowerCase().includes(normalizedName)) {
+                    return conceptsDB[key];
+                }
+            }
+            return null;
+        }
+        
+        // 默认信息
+        function showDefaultInfo(name) {
+            document.getElementById('modal-title').textContent = name;
+            document.getElementById('modal-subtitle').textContent = 'AI 技术概念';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="modal-section">
+                    <p class="modal-text">该概念的详细信息正在完善中，你可以通过搜索引擎或AI助手了解更多关于 <strong>${name}</strong> 的信息。</p>
+                </div>
+                <div class="modal-highlight">
+                    <p>💡 提示：可以直接问AI助手 "什么是${name}？" 来获取详细解释</p>
+                </div>
+            `;
+            document.getElementById('modal').classList.add('active');
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        // 点击遮罩关闭
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        
+        // ESC关闭
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>

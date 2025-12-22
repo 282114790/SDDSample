@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度图解：LLM 内部机制与 Transformer 架构</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Chart.js 用于绘制图表 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #e2e8f0;
+        }
+        
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 3D Space Animation Container */
+        .space-container {
+            perspective: 1000px;
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .word-point {
+            position: absolute;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        
+        .word-point:hover {
+            z-index: 50;
+        }
+
+        .matrix-cell {
+            transition: background-color 0.3s;
+        }
+        
+        .matrix-cell:hover {
+            background-color: #3b82f6 !important;
+            transform: scale(1.1);
+        }
+
+        .slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #475569;
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .slider-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #60a5fa;
+            cursor: pointer;
+            transition: background .15s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- 导航 -->
+    <nav class="fixed top-0 w-full z-50 glass-panel border-b border-slate-700/50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-tight">LLM <span class="gradient-text">Deep Dive</span></h1>
+            <div class="text-sm text-slate-400">面向进阶读者的深度原理解析</div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-6 pt-28 pb-20 space-y-24">
+
+        <!-- 1. 语义向量空间 -->
+        <section id="embeddings">
+            <div class="mb-8">
+                <div class="text-blue-400 font-mono text-sm mb-2">01. EMBEDDINGS</div>
+                <h2 class="text-4xl font-bold mb-4">万物皆数：高维语义空间</h2>
+                <p class="text-slate-400 text-lg leading-relaxed max-w-3xl">
+                    计算机无法直接理解"苹果"或"香蕉"。大模型的第一步是将文字转化为<b>向量 (Vector)</b>。
+                    这就好比给每个词一个<b>GPS 坐标</b>。在这个空间里，语义相近的词距离更近。
+                    神奇的是，向量可以进行数学运算：<span class="font-mono text-yellow-400">King - Man + Woman ≈ Queen</span>
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <!-- 可视化演示区 -->
+                <div class="glass-panel p-6 h-[400px] relative space-container bg-slate-900" id="vector-space">
+                    <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 border border-slate-800 opacity-20 pointer-events-none"></div>
+                    <!-- 动态生成的词向量点将在这里 -->
+                    <div class="absolute bottom-4 left-4 text-xs text-slate-500 font-mono">
+                        X轴: 实体属性 (生物/非生物)<br>
+                        Y轴: 大小属性 (大/小)<br>
+                        (简化为2D演示，实际模型有数千维度)
+                    </div>
+                </div>
+
+                <!-- 解释与操作 -->
+                <div class="space-y-6">
+                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                        <h3 class="font-bold text-white mb-2">尝试点击下方的词：</h3>
+                        <div class="flex flex-wrap gap-2" id="word-buttons">
+                            <!-- 按钮由 JS 生成 -->
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-slate-400 space-y-2">
+                        <p><span class="text-blue-400">●</span> <b>Tokenization (分词)</b>: 首先将文本切碎成 token。</p>
+                        <p><span class="text-purple-400">●</span> <b>Embedding (嵌入)</b>: 查表得到初始坐标。</p>
+                        <p>在 GPT-3 中，每个词是一个 12,288 维的向量。为了演示，左侧将其降维到了 2D。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Transformer 内部机制 -->
+        <section id="transformer">
+            <div class="mb-8">
+                <div class="text-purple-400 font-mono text-sm mb-2">02. ATTENTION MECHANISM</div>
+                <h2 class="text-4xl font-bold mb-4">Transformer 的心脏：Q, K, V</h2>
+                <p class="text-slate-400 text-lg leading-relaxed max-w-3xl">
+                    自注意力机制 (Self-Attention) 是 LLM 理解上下文的关键。它通过三个矩阵运算来实现：
+                    <b>Query (查询)</b>、<b>Key (索引)</b> 和 <b>Value (内容)</b>。
+                    这就好比你在图书馆检索系统里找资料。
+                </p>
+            </div>
+
+            <div class="glass-panel p-8">
+                <div class="grid md:grid-cols-3 gap-8 text-center mb-12">
+                    <div class="relative group">
+                        <div class="w-16 h-16 mx-auto bg-blue-500/20 rounded-xl flex items-center justify-center text-2xl mb-4 border border-blue-500/50 group-hover:scale-110 transition">🔍</div>
+                        <h3 class="text-xl font-bold text-blue-400">Query (Q)</h3>
+                        <p class="text-sm text-slate-400 mt-2">"我想找什么？"</p>
+                        <p class="text-xs text-slate-500 mt-1">当前正在处理的 Token</p>
+                    </div>
+                    <div class="relative group">
+                        <div class="w-16 h-16 mx-auto bg-yellow-500/20 rounded-xl flex items-center justify-center text-2xl mb-4 border border-yellow-500/50 group-hover:scale-110 transition">🏷️</div>
+                        <h3 class="text-xl font-bold text-yellow-400">Key (K)</h3>
+                        <p class="text-sm text-slate-400 mt-2">"我和什么相关？"</p>
+                        <p class="text-xs text-slate-500 mt-1">句中所有其他 Token 的标签</p>
+                    </div>
+                    <div class="relative group">
+                        <div class="w-16 h-16 mx-auto bg-green-500/20 rounded-xl flex items-center justify-center text-2xl mb-4 border border-green-500/50 group-hover:scale-110 transition">📦</div>
+                        <h3 class="text-xl font-bold text-green-400">Value (V)</h3>
+                        <p class="text-sm text-slate-400 mt-2">"我要提取什么信息？"</p>
+                        <p class="text-xs text-slate-500 mt-1">Token 的实际语义内容</p>
+                    </div>
+                </div>
+
+                <!-- 矩阵运算可视化 -->
+                <div class="border-t border-slate-700/50 pt-8">
+                    <h3 class="text-center font-bold mb-6">注意力计算流程：Score = Q × K</h3>
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-sm font-mono">
+                        <!-- Q Matrix -->
+                        <div class="bg-slate-800 p-4 rounded border border-slate-600">
+                            <div class="text-center text-blue-400 mb-2">Q (银行)</div>
+                            <div class="grid grid-cols-1 gap-1">
+                                <div class="bg-blue-500/30 h-4 w-12 rounded"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-xl text-slate-500">×</div>
+
+                        <!-- K Matrix -->
+                        <div class="bg-slate-800 p-4 rounded border border-slate-600">
+                            <div class="text-center text-yellow-400 mb-2">K (转置)</div>
+                            <div class="flex gap-2">
+                                <div class="flex flex-col items-center gap-1">
+                                    <div class="h-12 w-4 bg-yellow-500/30 rounded"></div>
+                                    <span class="text-xs">河边</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1">
+                                    <div class="h-12 w-4 bg-yellow-500/30 rounded"></div>
+                                    <span class="text-xs">金钱</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-xl text-slate-500">=</div>
+
+                        <!-- Attention Score -->
+                        <div class="bg-slate-800 p-4 rounded border border-slate-600">
+                            <div class="text-center text-white mb-2">Attention Weights</div>
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-12 text-right text-xs">河边</span>
+                                    <div class="w-24 bg-slate-700 h-2 rounded overflow-hidden">
+                                        <div class="bg-red-500 h-full w-[10%]"></div>
+                                    </div>
+                                    <span class="text-xs text-slate-400">0.1</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-12 text-right text-xs">金钱</span>
+                                    <div class="w-24 bg-slate-700 h-2 rounded overflow-hidden">
+                                        <div class="bg-green-500 h-full w-[90%]"></div>
+                                    </div>
+                                    <span class="text-xs text-slate-400">0.9</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-center text-slate-400 text-sm mt-4">
+                        当模型看到"银行"时，如果上下文是"金钱"，注意力分数会很高；如果是"河边"，分数会很低。<br>
+                        这消除了歧义（Bank: 银行 vs 河岸）。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 温度与采样 -->
+        <section id="temperature">
+            <div class="mb-8">
+                <div class="text-pink-400 font-mono text-sm mb-2">03. INFERENCE & TEMPERATURE</div>
+                <h2 class="text-4xl font-bold mb-4">为什么 AI 每次回答都不一样？</h2>
+                <p class="text-slate-400 text-lg leading-relaxed max-w-3xl">
+                    模型输出的不是唯一的字，而是所有可能字的<b>概率分布</b>。
+                    <b>Temperature (温度)</b> 参数控制选择的随机性。
+                    <br>温度低 = 保守、准确（选择概率最大的）；温度高 = 创意、随机（有机会选择概率较小的）。
+                </p>
+            </div>
+
+            <div class="glass-panel p-8">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="w-full md:w-1/3 space-y-6">
+                        <div>
+                            <label class="flex justify-between text-sm font-bold mb-2">
+                                <span>Temperature (温度)</span>
+                                <span id="temp-value" class="text-pink-400">0.7</span>
+                            </label>
+                            <input type="range" min="0.1" max="1.5" step="0.1" value="0.7" id="temp-slider" class="slider-thumb w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs text-slate-500 mt-2">
+                                <span>严谨 (0.1)</span>
+                                <span>平衡 (0.7)</span>
+                                <span>疯狂 (1.5)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 bg-slate-800 rounded-lg border border-slate-700">
+                            <p class="text-sm text-slate-300 mb-2">前文输入：</p>
+                            <p class="font-mono text-lg">"天空是..."</p>
+                        </div>
+
+                        <button id="generate-btn" class="w-full py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-lg font-bold transition">生成下一个字</button>
+                    </div>
+
+                    <div class="w-full md:w-2/3">
+                        <canvas id="probabilityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 涌现现象 -->
+        <section id="emergence" class="pb-12">
+            <div class="mb-8">
+                <div class="text-yellow-400 font-mono text-sm mb-2">04. SCALING LAWS & EMERGENCE</div>
+                <h2 class="text-4xl font-bold mb-4">量变引起质变：涌现 (Emergence)</h2>
+                <p class="text-slate-400 text-lg leading-relaxed max-w-3xl">
+                    当你把单个水分子放大，你看不到"湿润"。当你把单个神经元放大，你看不到"智慧"。
+                    只有当模型参数达到 100亿、1000亿级别时，一些意想不到的能力（如数学推理、代码编写）突然出现了。
+                    这就是<b>涌现</b>。
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass-panel p-4 text-center">
+                    <div class="text-3xl mb-2">🐜</div>
+                    <div class="font-bold">10M 参数</div>
+                    <div class="text-xs text-slate-500">连词成句</div>
+                </div>
+                <div class="glass-panel p-4 text-center opacity-50">
+                    <div class="text-3xl mb-2">🐒</div>
+                    <div class="font-bold">1B 参数</div>
+                    <div class="text-xs text-slate-500">基本常识</div>
+                </div>
+                <div class="glass-panel p-4 text-center opacity-75">
+                    <div class="text-3xl mb-2">🧒</div>
+                    <div class="font-bold">10B 参数</div>
+                    <div class="text-xs text-slate-500">翻译/摘要</div>
+                </div>
+                <div class="glass-panel p-4 text-center border-2 border-yellow-500/50 shadow-[0_0_20px_rgba(234,179,8,0.2)]">
+                    <div class="text-3xl mb-2">🧠</div>
+                    <div class="font-bold text-yellow-400">100B+ 参数</div>
+                    <div class="text-xs text-slate-300">推理/编程/涌现</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 border-t border-slate-800 py-12 text-center text-slate-500 text-sm">
+        <p>Created for SDD Sample Project. 探索 LLM 的深层逻辑。</p>
+    </footer>
+
+    <!-- 脚本逻辑 -->
+    <script>
+        // --- 1. 向量空间模拟 ---
+        const words = [
+            { text: "国王", x: 80, y: 80, color: "#60a5fa" }, // Men
+            { text: "男人", x: 60, y: 60, color: "#60a5fa" },
+            { text: "王后", x: 80, y: 20, color: "#f472b6" }, // Women
+            { text: "女人", x: 60, y: 40, color: "#f472b6" },
+            { text: "苹果", x: 20, y: 30, color: "#4ade80" }, // Fruits
+            { text: "香蕉", x: 30, y: 20, color: "#4ade80" },
+            { text: "汽车", x: 20, y: 80, color: "#94a3b8" }, // Objects
+        ];
+
+        const container = document.getElementById('vector-space');
+        const btnContainer = document.getElementById('word-buttons');
+
+        words.forEach(word => {
+            // Create Point in Space
+            const el = document.createElement('div');
+            el.className = 'word-point flex flex-col items-center group';
+            el.style.left = word.x + '%';
+            el.style.bottom = word.y + '%';
+            el.innerHTML = `
+                <div class="w-3 h-3 rounded-full shadow-lg mb-1 group-hover:scale-150 transition-transform" style="background-color: ${word.color}"></div>
+                <span class="text-xs bg-slate-900/80 px-1 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity">${word.text}</span>
+            `;
+            container.appendChild(el);
+
+            // Create Button
+            const btn = document.createElement('button');
+            btn.className = `px-3 py-1 text-xs rounded border border-slate-600 hover:bg-slate-700 transition text-white`;
+            btn.innerText = word.text;
+            btn.onclick = () => {
+                // Highlight point
+                document.querySelectorAll('.word-point span').forEach(s => s.style.opacity = '0');
+                el.querySelector('span').style.opacity = '1';
+                el.querySelector('.w-3').style.transform = 'scale(2)';
+                setTimeout(() => {
+                    el.querySelector('.w-3').style.transform = 'scale(1)';
+                }, 1000);
+            };
+            btnContainer.appendChild(btn);
+        });
+
+
+        // --- 2. Temperature Chart ---
+        const ctx = document.getElementById('probabilityChart').getContext('2d');
+        
+        // 原始 Logits (未经 Softmax 的分数) - 模拟值
+        const baseLogits = {
+            '蓝色的': 5.0,
+            '灰色的': 3.5,
+            '广阔的': 2.0,
+            '棉花糖': 0.5,
+            '只有鸟': -1.0
+        };
+
+        let chart;
+
+        function softmax(logits, temperature) {
+            let sumExp = 0;
+            const exps = {};
+            for (let key in logits) {
+                // Apply temperature: logit / T
+                const val = Math.exp(logits[key] / temperature);
+                exps[key] = val;
+                sumExp += val;
+            }
+            // Normalize
+            const probs = {};
+            for (let key in logits) {
+                probs[key] = exps[key] / sumExp;
+            }
+            return probs;
+        }
+
+        function updateChart(temperature) {
+            const probs = softmax(baseLogits, temperature);
+            const labels = Object.keys(probs);
+            const data = Object.values(probs);
+
+            if (chart) {
+                chart.data.datasets[0].data = data;
+                chart.update();
+            } else {
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '预测概率 (Probability)',
+                            data: data,
+                            backgroundColor: [
+                                '#3b82f6', // 蓝
+                                '#94a3b8', // 灰
+                                '#a78bfa', // 紫
+                                '#f472b6', // 粉
+                                '#ef4444'  // 红
+                            ],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1,
+                                grid: { color: '#334155' },
+                                ticks: { color: '#94a3b8' }
+                            },
+                            x: {
+                                ticks: { color: '#e2e8f0', font: { size: 14 } }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+        }
+
+        const slider = document.getElementById('temp-slider');
+        const tempValue = document.getElementById('temp-value');
+        
+        slider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            tempValue.innerText = val.toFixed(1);
+            updateChart(val);
+        });
+
+        // Initial render
+        updateChart(0.7);
+
+        // Generate Button Animation
+        document.getElementById('generate-btn').addEventListener('click', () => {
+            const temp = parseFloat(slider.value);
+            const probs = softmax(baseLogits, temp);
+            
+            // Weighted Random Choice
+            let sum = 0;
+            const r = Math.random();
+            let selected = '';
+            for (let key in probs) {
+                sum += probs[key];
+                if (r <= sum) {
+                    selected = key;
+                    break;
+                }
+            }
+
+            alert(`基于当前温度 ${temp}，AI 选择了：\n\n"${selected}"`);
+        });
+
+    </script>
+</body>
+</html>
+
