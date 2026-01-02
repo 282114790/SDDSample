@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>单词闪电跑酷 (Word Dash) - 最终版</title>
+    <title>单词闪电跑酷 (Word Dash) - 新春马年版</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+SC:wght@400;700&display=swap');
 
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #87CEEB;
+            background-color: #B71C1C; /* 深红背景 */
             font-family: 'Noto Sans SC', sans-serif;
             touch-action: none;
             user-select: none;
@@ -24,14 +24,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
         canvas {
             display: block;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5); /* 更深的阴影 */
+            border-radius: 4px; /* 轻微圆角 */
         }
 
-        /* 界面覆盖层 */
+        /* 界面覆盖层 - 玻璃拟态 */
         .overlay {
             position: absolute;
             top: 0;
@@ -42,57 +44,82 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(0, 0, 0, 0.85);
-            color: white;
+            background: rgba(183, 28, 28, 0.85); /* 深红半透明 */
+            backdrop-filter: blur(8px); /* 毛玻璃 */
             z-index: 10;
-            transition: opacity 0.3s;
-            backdrop-filter: blur(5px);
+            transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .hidden {
-            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
+        /* 标题设计 */
         h1 {
             font-family: 'Fredoka One', cursive;
-            font-size: 2.5rem;
-            color: #FFD700;
-            text-shadow: 4px 4px 0 #FF4500;
-            margin-bottom: 10px;
+            font-size: 3.5rem;
+            background: linear-gradient(to bottom, #FFD700, #FFA000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 4px 0px #8B0000);
+            margin-bottom: 0.5rem;
             text-align: center;
             letter-spacing: 2px;
+            transform: rotate(-3deg); /* 俏皮倾斜 */
+            animation: floatTitle 3s ease-in-out infinite;
         }
 
+        @keyframes floatTitle {
+            0%, 100% { transform: rotate(-3deg) translateY(0); }
+            50% { transform: rotate(-3deg) translateY(-10px); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #FFECB3;
+            margin-bottom: 2rem;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        /* 3D果冻按钮 */
         .btn {
-            background: linear-gradient(to bottom, #4CAF50, #2E7D32);
+            position: relative;
+            background: linear-gradient(to bottom, #FFEB3B, #FBC02D);
             border: none;
-            padding: 15px 40px;
-            font-size: 1.3rem;
-            color: white;
-            border-radius: 50px;
+            padding: 15px 60px;
+            font-size: 1.8rem;
+            color: #E65100;
+            border-radius: 60px;
             cursor: pointer;
             font-family: 'Fredoka One', cursive;
-            box-shadow: 0 6px 0 #1B5E20;
-            transition: transform 0.1s, box-shadow 0.1s;
-            margin: 10px;
+            box-shadow: 0 8px 0 #F57F17, 0 15px 20px rgba(0,0,0,0.2);
+            transition: all 0.1s ease;
+            margin: 15px;
             text-transform: uppercase;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #1B5E20;
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #F57F17, 0 5px 10px rgba(0,0,0,0.2);
+        }
+        
+        .btn:hover {
+            filter: brightness(1.1);
         }
 
-        .btn-blue { background: linear-gradient(to bottom, #2196F3, #1565C0); box-shadow: 0 6px 0 #0D47A1; }
-
-        /* HUD */
+        /* HUD 设计 */
         #hud {
             position: absolute;
-            top: 10px;
+            top: 20px;
             left: 0;
             width: 100%;
-            padding: 0 15px;
+            padding: 0 20px;
             box-sizing: border-box;
             display: flex;
             justify-content: space-between;
@@ -101,40 +128,56 @@
         }
 
         .hud-item {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 8px 20px;
-            border-radius: 30px;
+            background: #FFF;
+            padding: 10px 25px;
+            border-radius: 50px;
             font-weight: 800;
-            color: #333;
-            font-size: 1.1rem;
-            border: 3px solid #333;
-            min-width: 80px;
+            color: #D32F2F;
+            font-size: 1.2rem;
+            border-bottom: 4px solid #EF9A9A;
+            min-width: 90px;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Fredoka One', cursive; /* 统一字体 */
         }
         
-        #score-container {
-            position: relative;
-        }
-
-        /* 结算面板 */
+        /* 结算面板卡片 */
         #result-content {
-            background: white;
+            background: #FFF;
             color: #333;
-            padding: 20px;
-            border-radius: 25px;
+            padding: 30px;
+            border-radius: 30px;
             width: 90%;
-            max-width: 450px;
-            max-height: 70vh;
+            max-width: 480px;
+            max-height: 75vh;
             overflow-y: auto;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 6px solid #FFD700;
+            position: relative;
+        }
+        
+        /* 滚动条美化 */
+        #result-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        #result-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        #result-content::-webkit-scrollbar-thumb {
+            background: #FFD54F;
+            border-radius: 4px;
         }
 
         .word-list {
             list-style: none;
             padding: 0;
-            margin: 15px 0;
+            margin: 20px 0;
             text-align: left;
         }
 
@@ -142,41 +185,59 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            border-bottom: 2px solid #f0f0f0;
-            font-size: 1rem;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: #FAFAFA;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        
+        .word-item:hover {
+            transform: scale(1.02);
         }
 
         .word-item.wrong {
-            background-color: #ffebee;
-            color: #d32f2f;
-            border-radius: 8px;
+            background-color: #FFEBEE;
+            border-left: 5px solid #EF5350;
         }
         
         .word-item.correct {
-            color: #2E7D32;
+            background-color: #E8F5E9;
+            border-left: 5px solid #66BB6A;
         }
 
         .audio-btn {
             background: #fff;
-            border: 2px solid #ddd;
+            border: none;
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             cursor: pointer;
             margin-left: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #555;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        
+        .audio-btn:hover {
+            background: #2196F3;
+            color: white;
+            transform: scale(1.1);
         }
         
         .controls-hint {
-            margin-top: 20px; 
-            font-size: 0.9rem; 
-            color: #eee; 
-            background: rgba(0,0,0,0.3); 
-            padding: 5px 15px; 
-            border-radius: 20px;
+            margin-top: 25px; 
+            font-size: 1rem; 
+            color: #FFD700; 
+            background: rgba(0,0,0,0.4); 
+            padding: 8px 20px; 
+            border-radius: 30px;
+            font-weight: bold;
+            backdrop-filter: blur(4px);
         }
     </style>
 </head>
@@ -187,9 +248,9 @@
 
     <!-- 开始界面 -->
     <div id="start-screen" class="overlay">
-        <h1>⚡ 单词闪电跑酷 ⚡</h1>
-        <p style="font-size: 1.2rem; margin-bottom: 5px; font-weight: bold; color: #FFEB3B;">Unit 1: Where do people live?</p>
-        <p style="font-size: 0.9rem; margin-bottom: 30px; opacity: 0.8;">使用真人发音 (需联网)</p>
+        <h1>🧨 单词奔腾 🐎</h1>
+        <p style="font-size: 1.3rem; margin-bottom: 5px; font-weight: bold; color: #FFF;">新春特别版</p>
+        <p style="font-size: 0.9rem; margin-bottom: 30px; opacity: 0.9;">Unit 1 - Unit 8 全词汇</p>
         
         <button class="btn" onclick="startGame()">开始挑战</button>
         
@@ -200,19 +261,19 @@
 
     <!-- HUD -->
     <div id="hud" class="hidden">
-        <div class="hud-item" style="color: #d32f2f;">❤️ <span id="lives">3</span></div>
-        <div id="score-container" class="hud-item" style="color: #FF9800;">⭐ <span id="score">0</span></div>
-        <div class="hud-item" style="color: #2196F3;">🎯 <span id="progress">0/15</span></div>
+        <div class="hud-item" style="color: #D32F2F;">❤️ <span id="lives">3</span></div>
+        <div id="score-container" class="hud-item" style="color: #FF8F00;">⭐ <span id="score">0</span></div>
+        <div class="hud-item" style="color: #1976D2;">🎯 <span id="progress">0/15</span></div>
     </div>
 
     <!-- 结算界面 -->
     <div id="game-over-screen" class="overlay hidden">
-        <h1 id="end-title">挑战结束!</h1>
+        <h1 id="end-title">恭喜发财!</h1>
         <div id="result-content">
-            <h2 id="final-score" style="color:#333; margin-bottom:5px;">得分: 0</h2>
+            <h2 id="final-score" style="color:#D32F2F; margin-bottom:5px;">得分: 0</h2>
             <div id="star-rating" style="font-size: 1.5rem; margin-bottom: 15px;"></div>
             
-            <h3 style="text-align: left; border-bottom: 2px solid #eee; padding-bottom: 5px; font-size:1rem;">本次单词回顾</h3>
+            <h3 style="text-align: left; border-bottom: 2px solid #FFCDD2; padding-bottom: 5px; font-size:1rem; color:#D32F2F;">本次单词回顾</h3>
             <ul id="word-review-list" class="word-list">
                 <!-- 动态生成 -->
             </ul>
@@ -229,85 +290,52 @@
     
     // 词库更新: 四年级上册全学期词汇 (Unit 1 - Unit 8)
     const VOCABULARY = [
-        // Unit 1: Where do people live?
-        { word: "city", meaning: "城市" },
-        { word: "building", meaning: "建筑物" },
-        { word: "flat", meaning: "公寓" },
-        { word: "street", meaning: "街道" },
-        { word: "country", meaning: "国家; 乡村" },
-        { word: "farm", meaning: "农场" },
-        { word: "house", meaning: "房子" },
-        { word: "live", meaning: "居住" },
-        
-        // Unit 2: Where do animals live?
-        { word: "eagle", meaning: "老鹰" },
-        { word: "owl", meaning: "猫头鹰" },
-        { word: "honeybee", meaning: "蜜蜂" },
-        { word: "forest", meaning: "森林" },
-        { word: "hole", meaning: "洞" },
+        // Unit 1
+        { word: "city", meaning: "城市" }, { word: "building", meaning: "建筑物" },
+        { word: "flat", meaning: "公寓" }, { word: "street", meaning: "街道" },
+        { word: "country", meaning: "国家" }, { word: "farm", meaning: "农场" },
+        { word: "house", meaning: "房子" }, { word: "live", meaning: "居住" },
+        // Unit 2
+        { word: "eagle", meaning: "老鹰" }, { word: "owl", meaning: "猫头鹰" },
+        { word: "honeybee", meaning: "蜜蜂" }, { word: "forest", meaning: "森林" },
         { word: "nest", meaning: "鸟巢" },
-        
-        // Unit 3: How do we use numbers?
-        { word: "odd", meaning: "奇数的" },
-        { word: "even", meaning: "偶数的" },
-        { word: "plus", meaning: "加" },
-        { word: "minus", meaning: "减" },
-        { word: "equal", meaning: "等于" },
+        // Unit 3
+        { word: "odd", meaning: "奇数" }, { word: "even", meaning: "偶数" },
+        { word: "plus", meaning: "加" }, { word: "minus", meaning: "减" },
         { word: "number", meaning: "数字" },
-        { word: "fifteen", meaning: "十五" },
-        { word: "fifty", meaning: "五十" },
-
-        // Unit 4: What do we buy?
-        { word: "supermarket", meaning: "超市" },
-        { word: "rice", meaning: "米饭" },
-        { word: "bag", meaning: "袋子" },
-        { word: "bottle", meaning: "瓶子" },
-        { word: "juice", meaning: "果汁" },
-        { word: "box", meaning: "盒子" },
-        { word: "biscuit", meaning: "饼干" },
-
-        // Unit 5: How are the seasons different?
-        { word: "spring", meaning: "春天" },
-        { word: "summer", meaning: "夏天" },
-        { word: "autumn", meaning: "秋天" },
-        { word: "winter", meaning: "冬天" },
-        { word: "warm", meaning: "温暖的" },
-        { word: "cool", meaning: "凉爽的" },
-        { word: "cold", meaning: "冷的" },
-
-        // Unit 6: What's amazing about plants?
-        { word: "plant", meaning: "植物" },
-        { word: "flower", meaning: "花" },
-        { word: "fruit", meaning: "水果" },
-        { word: "seed", meaning: "种子" },
-        { word: "soil", meaning: "土壤" },
-        { word: "leaf", meaning: "叶子" },
-        { word: "grow", meaning: "生长" },
-
-        // Unit 7: How do we keep safe on the road?
-        { word: "traffic", meaning: "交通" },
-        { word: "light", meaning: "灯" },
-        { word: "wait", meaning: "等待" },
-        { word: "stop", meaning: "停止" },
-        { word: "cross", meaning: "穿过" },
-        { word: "pavement", meaning: "人行道" },
-
-        // Unit 8: What do our grandparents do?
-        { word: "busy", meaning: "忙碌的" },
-        { word: "cook", meaning: "做饭" },
-        { word: "sweep", meaning: "扫" },
-        { word: "floor", meaning: "地板" },
-        { word: "wash", meaning: "洗" },
-        { word: "dish", meaning: "盘子" }
+        // Unit 4
+        { word: "supermarket", meaning: "超市" }, { word: "rice", meaning: "米饭" },
+        { word: "juice", meaning: "果汁" }, { word: "biscuit", meaning: "饼干" },
+        // Unit 5
+        { word: "spring", meaning: "春天" }, { word: "summer", meaning: "夏天" },
+        { word: "autumn", meaning: "秋天" }, { word: "winter", meaning: "冬天" },
+        { word: "warm", meaning: "温暖" }, { word: "cold", meaning: "寒冷" },
+        // Unit 6
+        { word: "plant", meaning: "植物" }, { word: "flower", meaning: "花" },
+        { word: "fruit", meaning: "水果" }, { word: "seed", meaning: "种子" },
+        // Unit 7
+        { word: "traffic", meaning: "交通" }, { word: "light", meaning: "灯" },
+        { word: "wait", meaning: "等待" }, { word: "stop", meaning: "停止" },
+        // Unit 8
+        { word: "busy", meaning: "忙碌" }, { word: "cook", meaning: "做饭" },
+        { word: "wash", meaning: "洗" }
     ];
 
-    const GAME_SPEED_INITIAL = 1.3; 
-    const SPEED_INCREMENT = 0.05;   
-    // 修改规则：一局的题目数量 = 词库的总单词数 (50+)
-    // 这样确保每个单词都有机会出现至少一次
+    const GAME_SPEED_INITIAL = 0.52; // 提速 50% (0.35 * 1.5)
+    const SPEED_INCREMENT = 0.02; 
     const TOTAL_QUESTIONS = VOCABULARY.length;
 
-    const BUBBLE_COLORS = ['#FF9800', '#2196F3', '#9C27B0', '#009688', '#E91E63', '#3F51B5'];
+    // 新年配色泡泡 -> 升级为高饱和度糖果色
+    const BUBBLE_COLORS = [
+        '#FF4081', // 艳粉
+        '#7C4DFF', // 深紫
+        '#00E5FF', // 亮青
+        '#00E676', // 荧光绿
+        '#FFAB00', // 亮橙
+        '#FF3D00', // 猩红
+        '#2979FF', // 宝蓝
+        '#F50057'  // 这里的颜色更鲜艳，能从背景中跳出来
+    ];
 
     function getRandomColor() {
         return BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
@@ -327,17 +355,18 @@
         playerLane: 1, 
         items: [],     
         particles: [], 
-        fireworks: [], // 烟花数组
+        fireworks: [], 
         coins: [], 
         floatingTexts: [], 
         decorations: [], 
         clouds: [],      
         currentTask: null, 
         questionsAnswered: 0,
-        currentStreak: 0, // 连对计数
+        currentStreak: 0,
         spawnCooldown: 0,
         history: [],
-        frameCount: 0
+        frameCount: 0,
+        usedIndices: new Set()
     };
 
     let lastTime = 0;
@@ -362,10 +391,10 @@
         gain.connect(audioCtx.destination);
         
         if (type === 'correct') {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.type = 'triangle'; // 更欢快的音色
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.3);
@@ -379,25 +408,22 @@
             osc.stop(audioCtx.currentTime + 0.3);
         } else if (type === 'coin') {
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1800, audioCtx.currentTime + 0.1);
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.frequency.setValueAtTime(1500, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
+            osc.stop(audioCtx.currentTime + 0.1);
         } else if (type === 'firework') {
-            // 烟花爆炸声 (简单的噪声模拟)
-            const bufferSize = audioCtx.sampleRate * 0.5; // 0.5秒
+            // 简单的爆竹声
+            const bufferSize = audioCtx.sampleRate * 0.3;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
             const noise = audioCtx.createBufferSource();
             noise.buffer = buffer;
             const noiseGain = audioCtx.createGain();
             noiseGain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
             noise.connect(noiseGain);
             noiseGain.connect(audioCtx.destination);
             noise.start();
@@ -418,25 +444,18 @@
             return;
         }
 
-        // 确保不连续出现完全相同的词（简单检查）
-        // 如果题目还没出完，尽量不重复出题
         let availableIndices = [];
         if (!gameState.usedIndices) gameState.usedIndices = new Set();
-        
-        // 找出还没出过的单词索引
         for(let i=0; i<VOCABULARY.length; i++) {
             if(!gameState.usedIndices.has(i)) availableIndices.push(i);
         }
         
         let targetIndex;
-        // 如果还有没出过的词，优先从里面选
         if (availableIndices.length > 0) {
             const randomIndex = Math.floor(Math.random() * availableIndices.length);
             targetIndex = availableIndices[randomIndex];
             gameState.usedIndices.add(targetIndex);
         } else {
-            // 如果全出完了（理论上 TOTAL_QUESTIONS = length 不会走到这，除非逻辑修改）
-            // 就随机选一个作为兜底
             targetIndex = Math.floor(Math.random() * VOCABULARY.length);
         }
 
@@ -456,6 +475,9 @@
         const laneIndices = [0, 1, 2].sort(() => Math.random() - 0.5);
         const startY = -300; 
         
+        // 确保一行三个气泡颜色各不相同，避免撞色
+        const shuffledColors = [...BUBBLE_COLORS].sort(() => 0.5 - Math.random());
+        
         const isTargetEnglish = (mode === 'CN_to_EN'); 
         
         gameState.items.push({
@@ -465,7 +487,7 @@
             isTarget: true,
             lane: laneIndices[0],
             y: startY,
-            color: getRandomColor()
+            color: shuffledColors[0]
         });
 
         let wrong1 = getDistractor(targetWord);
@@ -476,7 +498,7 @@
             isTarget: false,
             lane: laneIndices[1],
             y: startY,
-            color: getRandomColor()
+            color: shuffledColors[1]
         });
 
         let wrong2 = getDistractor(targetWord, wrong1);
@@ -487,7 +509,7 @@
             isTarget: false,
             lane: laneIndices[2],
             y: startY,
-            color: getRandomColor()
+            color: shuffledColors[2]
         });
     }
 
@@ -501,7 +523,8 @@
         return distractor;
     }
 
-    function spawnDecoration() {
+    // 生成装饰物 (灯笼/梅花树/小动物/彩旗)
+    function spawnDecoration(y) {
         const side = Math.random() > 0.5 ? 'left' : 'right';
         const laneWidth = canvas.width / 4;
         const centerX = canvas.width / 2;
@@ -513,32 +536,46 @@
             x = (centerX + laneWidth * 1.6) + Math.random() * (centerX - laneWidth * 1.6);
         }
 
+        const rand = Math.random();
+        let type, scale;
+        
+        if (rand > 0.7) {
+            type = 'lantern_tree'; // 挂红灯笼的树
+            scale = 0.8 + Math.random() * 0.4;
+        } else if (rand > 0.4) {
+            type = 'animal'; // 围观小动物
+            // 2. 调大动物尺寸 (与主角相当，约1.5-2.0倍原比例)
+            scale = 1.6 + Math.random() * 0.4; 
+        } else {
+            type = 'flag'; // 彩旗
+            scale = 0.7 + Math.random() * 0.3;
+        }
+
         gameState.decorations.push({
             x: x,
-            y: -100,
-            type: Math.random() > 0.7 ? 'tree' : 'bush',
-            scale: 0.8 + Math.random() * 0.4,
-            color: Math.random() > 0.5 ? '#4CAF50' : '#66BB6A'
+            y: y !== undefined ? y : -100, // 支持指定Y坐标
+            type: type,
+            scale: scale,
+            animalType: ['🐼','🐰','🐯','🐥'][Math.floor(Math.random()*4)]
         });
     }
 
+    // 生成祥云
     function spawnCloud() {
         gameState.clouds.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height * 0.4,
-            size: 30 + Math.random() * 40,
+            size: 45 + Math.random() * 60, // 3. 增加云朵大小 (平均增加50%)
             speed: 0.2 + Math.random() * 0.5
         });
     }
 
-    // 烟花粒子系统
     function spawnFirework(x, y) {
         playBeep('firework');
-        // 核心爆炸点
         for (let i = 0; i < 80; i++) {
             const angle = Math.random() * Math.PI * 2;
             const velocity = Math.random() * 6 + 2;
-            const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+            const color = `hsl(${Math.random() * 60 + 330}, 100%, 60%)`; // 红色/金色系烟花
             
             gameState.fireworks.push({
                 x: x,
@@ -562,19 +599,13 @@
             p.vy += p.gravity;
             p.life -= p.decay;
             p.alpha = p.life;
-            
-            // 阻力
             p.vx *= 0.95;
             p.vy *= 0.95;
-
-            if (p.life <= 0) {
-                gameState.fireworks.splice(i, 1);
-            }
+            if (p.life <= 0) gameState.fireworks.splice(i, 1);
         }
     }
 
     function drawFireworks() {
-        // 叠加模式让烟花更亮
         ctx.globalCompositeOperation = 'lighter';
         gameState.fireworks.forEach(p => {
             ctx.globalAlpha = p.alpha;
@@ -600,10 +631,20 @@
     }
 
     function update(deltaTime) {
-        gameState.frameCount++;
-        gameState.speed = GAME_SPEED_INITIAL + (gameState.questionsAnswered * SPEED_INCREMENT);
+        if (!gameState.isRunning) return;
+        
+        // 震动衰减
+        if (gameState.shake > 0) {
+            gameState.shake *= 0.9;
+            if (gameState.shake < 0.5) gameState.shake = 0;
+        }
 
-        if (gameState.frameCount % 60 === 0) spawnDecoration();
+        gameState.frameCount++;
+        // 1. 移除速度递增逻辑，保持恒定速度
+        gameState.speed = GAME_SPEED_INITIAL;
+
+        // 2. 减少装饰物密度 (100 -> 200 帧生成一次)
+        if (gameState.frameCount % 200 === 0) spawnDecoration();
         for (let i = gameState.decorations.length - 1; i >= 0; i--) {
             let d = gameState.decorations[i];
             d.y += gameState.speed; 
@@ -614,14 +655,27 @@
             c.x += c.speed;
             if (c.x > canvas.width + 100) c.x = -100;
         });
+        
+        // 3. 严格控制云朵生成，防止堆积
+        if (gameState.clouds.length < 3 && Math.random() < 0.005) spawnCloud();
 
         for (let i = gameState.items.length - 1; i >= 0; i--) {
+            if (i >= gameState.items.length) break;
             let item = gameState.items[i];
-            item.y += gameState.speed;
+            if (!item) continue;
 
+            item.y += gameState.speed * 3.5;
+
+            // 碰撞检测优化: 确保只触发一次
             if (!item.hit && checkCollision(item)) {
                 handleCollision(item);
-                item.hit = true;
+                item.hit = true; // 标记为已撞击
+                
+                // 如果碰撞导致任务结束（答对或答错），handleCollision -> handleWrong 会清空 items
+                // 所以这里可以直接 break
+                if (gameState.currentTask && gameState.currentTask.processing) break;
+                
+                // 如果是金币或其他不结束任务的物品，移除它
                 gameState.items.splice(i, 1);
                 continue;
             }
@@ -630,6 +684,7 @@
                 gameState.items.splice(i, 1);
                 if (item.isTarget) {
                     handleWrong("missed");
+                    if (gameState.currentTask && gameState.currentTask.processing) break;
                 }
             }
         }
@@ -656,7 +711,17 @@
             if (ft.life <= 0) gameState.floatingTexts.splice(i, 1);
         }
 
-        updateParticles();
+        // 更新粒子
+        if (gameState.particles) {
+            gameState.particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.03;
+                p.vy += 0.2;
+            });
+            gameState.particles = gameState.particles.filter(p => p.life > 0);
+        }
+        
         updateFireworks();
 
         if (gameState.currentTask) {
@@ -675,10 +740,8 @@
     function checkCollision(item) {
         const playerY = canvas.height - 180; 
         const hitRangeY = 70; 
-        
         if (item.lane !== gameState.playerLane) return false;
         if (Math.abs(item.y - playerY) < hitRangeY) return true;
-        
         return false;
     }
 
@@ -691,7 +754,7 @@
                 createParticles(item.lane, canvas.height - 150, '#FFD700');
             } else {
                 handleWrong("wrong", item.lane, canvas.height - 180);
-                createParticles(item.lane, canvas.height - 150, '#F44336');
+                createParticles(item.lane, canvas.height - 150, '#D32F2F');
             }
         }
     }
@@ -700,10 +763,14 @@
         const startX = getLaneX(gameState.playerLane);
         gameState.coins.push({ x: startX, y: y });
         
+        // 粒子爆炸效果
+        spawnExplosion(startX, y, '#FFD700'); // 金色爆炸
+        spawnExplosion(startX, y, '#FFF');    // 白色闪光
+        
         playBeep('correct');
         
         gameState.questionsAnswered++;
-        gameState.currentStreak++; // 连对计数增加
+        gameState.currentStreak++; 
         
         document.getElementById('progress').innerText = `${gameState.questionsAnswered}/${TOTAL_QUESTIONS}`;
 
@@ -713,9 +780,7 @@
             result: 'correct'
         });
         
-        // 3. 连续答对3次，触发烟花
         if (gameState.currentStreak > 0 && gameState.currentStreak % 3 === 0) {
-            // 在屏幕中心和随机位置放多个烟花
             spawnFirework(canvas.width / 2, canvas.height / 3);
             setTimeout(() => spawnFirework(canvas.width / 3, canvas.height / 4), 200);
             setTimeout(() => spawnFirework(canvas.width * 2 / 3, canvas.height / 4), 400);
@@ -723,9 +788,9 @@
             gameState.floatingTexts.push({
                 x: canvas.width / 2,
                 y: canvas.height / 2,
-                text: "Combo! 🔥",
+                text: "好样的! 🧨",
                 color: "#FFD700",
-                life: 3.0, // 停留久一点
+                life: 3.0, 
                 size: 60
             });
         }
@@ -736,14 +801,16 @@
     function handleWrong(type, lane, y) {
         loseLife();
         playBeep('wrong'); 
-        gameState.currentStreak = 0; // 答错重置连击
+        gameState.currentStreak = 0; 
+        
+        triggerShake(20); // 触发屏幕震动
         
         if (lane !== undefined) {
             gameState.floatingTexts.push({
                 x: getLaneX(lane),
                 y: y,
                 text: "❌",
-                color: "red",
+                color: "#D32F2F",
                 life: 1.0,
                 size: 60
             });
@@ -763,6 +830,12 @@
     function finishCurrentTask(cooldown) {
         if (gameState.currentTask) gameState.currentTask.processing = true;
         gameState.spawnCooldown = cooldown;
+        
+        for (let i = gameState.items.length - 1; i >= 0; i--) {
+            if (gameState.items[i].type === 'word') {
+                gameState.items.splice(i, 1);
+            }
+        }
     }
 
     function loseLife() {
@@ -770,7 +843,7 @@
         document.getElementById('lives').innerText = gameState.lives;
         
         const flash = document.createElement('div');
-        flash.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:red;opacity:0.3;z-index:9;pointer-events:none;transition:opacity 0.2s;';
+        flash.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:#D32F2F;opacity:0.3;z-index:9;pointer-events:none;transition:opacity 0.2s;';
         document.body.appendChild(flash);
         setTimeout(() => flash.style.opacity = 0, 100);
         setTimeout(() => flash.remove(), 300);
@@ -784,30 +857,48 @@
      * 绘图
      */
     function draw() {
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, '#4FC3F7'); 
-        gradient.addColorStop(1, '#E1F5FE');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.save();
+        
+        // 应用屏幕震动
+        if (gameState.shake > 0) {
+            const dx = (Math.random() - 0.5) * gameState.shake;
+            const dy = (Math.random() - 0.5) * gameState.shake;
+            ctx.translate(dx, dy);
+        }
 
-        drawClouds();
         drawRoad();
         drawDecorations();
-
-        gameState.items.forEach(drawItem);
+        drawClouds(); // 云朵在地上投下影子? 放在路面上层
+        
         drawPlayer();
+        
+        gameState.items.forEach(drawItem);
+        drawParticles(); // 绘制新加入的粒子
+        drawFireworks();
         drawCoins();
         drawFloatingTexts();
-        drawParticles();
-        drawFireworks(); // 绘制烟花
+        
+        ctx.restore(); // 震动结束，UI层不受震动影响
 
-        // Vignette (暗角)
-        const rad = canvas.width * 0.8;
-        const vig = ctx.createRadialGradient(canvas.width/2, canvas.height/2, rad * 0.4, canvas.width/2, canvas.height/2, rad);
-        vig.addColorStop(0, 'rgba(0,0,0,0)');
-        vig.addColorStop(1, 'rgba(0,0,0,0.15)');
-        ctx.fillStyle = vig;
-        ctx.fillRect(0,0,canvas.width,canvas.height);
+        // 绘制暗角 (Vignette) - 增加电影感 (暖色调)
+        const grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, canvas.height*0.4, canvas.width/2, canvas.height/2, canvas.height);
+        grad.addColorStop(0, 'rgba(0,0,0,0)');
+        grad.addColorStop(1, 'rgba(255, 112, 67, 0.3)'); // 暖橙色暗角
+        ctx.fillStyle = grad;
+        ctx.fillRect(0,0,canvas.width, canvas.height);
+    }
+    
+    function drawParticles() {
+        gameState.particles.forEach(p => {
+            ctx.globalAlpha = p.life;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+        });
     }
 
     function getLaneX(laneIndex) {
@@ -820,12 +911,13 @@
     }
 
     function drawClouds() {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
         gameState.clouds.forEach(c => {
+            // 简单的祥云 (由几个圆组成)
             ctx.beginPath();
             ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
-            ctx.arc(c.x + c.size * 0.8, c.y + c.size * 0.3, c.size * 0.7, 0, Math.PI * 2);
-            ctx.arc(c.x - c.size * 0.8, c.y + c.size * 0.3, c.size * 0.7, 0, Math.PI * 2);
+            ctx.arc(c.x + c.size * 0.7, c.y + c.size * 0.2, c.size * 0.6, 0, Math.PI * 2);
+            ctx.arc(c.x - c.size * 0.7, c.y + c.size * 0.2, c.size * 0.6, 0, Math.PI * 2);
             ctx.fill();
         });
     }
@@ -836,16 +928,58 @@
         const roadLeft = centerX - laneWidth * 1.5;
         const roadRight = centerX + laneWidth * 1.5;
         
-        ctx.fillStyle = '#81C784';
+        // 1. 背景草地 -> 暖奶油底 (Warm Cream)
+        ctx.fillStyle = '#FFF7E6'; 
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        ctx.fillStyle = '#795548';
+        // 路面底色 (稍微深一点的奶油色，用于衬托)
+        ctx.fillStyle = '#FFE0B2';
         ctx.fillRect(roadLeft, 0, roadRight - roadLeft, canvas.height);
+
+        // 2. 三色跑道 (落日糖果系)
+        const leftLaneX = centerX - laneWidth * 1.5;
+        const centerLaneX = centerX - laneWidth * 0.5;
+        const rightLaneX = centerX + laneWidth * 0.5;
+
+        // 左跑道: #FF6B6B (柔和红粉)
+        ctx.fillStyle = '#FF6B6B'; 
+        ctx.fillRect(leftLaneX, 0, laneWidth, canvas.height);
         
-        ctx.fillStyle = 'rgba(0,0,0,0.05)';
-        for(let i=0; i<10; i++) { }
+        // 中跑道: #FFD166 (暖黄)
+        ctx.fillStyle = '#FFD166'; 
+        ctx.fillRect(centerLaneX, 0, laneWidth, canvas.height);
         
-        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        // 右跑道: #4D96FF (清爽蓝)
+        ctx.fillStyle = '#4D96FF'; 
+        ctx.fillRect(rightLaneX, 0, laneWidth, canvas.height);
+        
+        // 3. 绘制纹理
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(roadLeft, 0, roadRight - roadLeft, canvas.height);
+        ctx.clip();
+        
+        const decorScroll = (Date.now() / 20) % 120;
+        
+        for (let y = -120; y < canvas.height + 120; y += 120) {
+            const dy = y + decorScroll;
+            
+            // 左跑道 (#FF6B6B): 白色纹理
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.25)'; 
+            drawDiamond(leftLaneX + laneWidth/2, dy);
+            
+            // 中跑道 (#FFD166): 白色纹理
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)'; 
+            drawCirclePattern(centerLaneX + laneWidth/2, dy, '#FFD166');
+            
+            // 右跑道 (#4D96FF): 白色纹理
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.25)'; 
+            drawTrianglePattern(rightLaneX + laneWidth/2, dy);
+        }
+        ctx.restore();
+        
+        // 分隔线 -> 纯白虚线
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; 
         ctx.lineWidth = 5;
         ctx.setLineDash([40, 40]); 
         
@@ -861,14 +995,45 @@
         
         ctx.setLineDash([]); 
         
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 8;
+        // 边线 -> 暖橙边线
+        ctx.strokeStyle = '#FFCC80';
+        ctx.lineWidth = 10;
         ctx.beginPath();
         ctx.moveTo(roadLeft + 5, 0);
         ctx.lineTo(roadLeft + 5, canvas.height);
         ctx.moveTo(roadRight - 5, 0);
         ctx.lineTo(roadRight - 5, canvas.height);
         ctx.stroke();
+    }
+    
+    // 纹理绘制辅助函数
+    function drawDiamond(cx, cy) {
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 20);
+        ctx.lineTo(cx + 20, cy);
+        ctx.lineTo(cx, cy + 20);
+        ctx.lineTo(cx - 20, cy);
+        ctx.fill();
+    }
+
+    function drawCirclePattern(cx, cy, laneColor) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, 18, 0, Math.PI*2);
+        ctx.fill();
+        // 中间孔洞
+        ctx.fillStyle = laneColor || '#FFD166'; 
+        ctx.beginPath();
+        ctx.rect(cx - 6, cy - 6, 12, 12);
+        ctx.fill();
+        // 恢复实际上不需要，因为每次循环都会重置fillStyle
+    }
+
+    function drawTrianglePattern(cx, cy) {
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 20);
+        ctx.lineTo(cx + 20, cy + 15);
+        ctx.lineTo(cx - 20, cy + 15);
+        ctx.fill();
     }
 
     function drawDecorations() {
@@ -877,27 +1042,110 @@
             const cy = d.y;
             const s = d.scale;
 
-            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            // 阴影
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
             ctx.beginPath();
-            ctx.ellipse(cx, cy + 20*s, 30*s, 10*s, 0, 0, Math.PI*2);
+            ctx.ellipse(cx, cy + 20*s, 20*s, 8*s, 0, 0, Math.PI*2);
             ctx.fill();
 
-            if (d.type === 'tree') {
+            if (d.type === 'lantern_tree' || d.type === 'tree') { // 兼容旧数据tree
+                // 树干
                 ctx.fillStyle = '#5D4037';
-                ctx.fillRect(cx - 10*s, cy - 60*s, 20*s, 80*s);
-                ctx.fillStyle = d.color;
+                ctx.fillRect(cx - 5*s, cy - 50*s, 10*s, 70*s);
+                // 树冠
+                ctx.fillStyle = '#2E7D32'; // 深绿
                 ctx.beginPath();
-                ctx.arc(cx, cy - 80*s, 40*s, 0, Math.PI*2);
-                ctx.arc(cx - 30*s, cy - 60*s, 30*s, 0, Math.PI*2);
-                ctx.arc(cx + 30*s, cy - 60*s, 30*s, 0, Math.PI*2);
+                ctx.arc(cx, cy - 60*s, 35*s, 0, Math.PI*2);
+                ctx.arc(cx - 20*s, cy - 40*s, 25*s, 0, Math.PI*2);
+                ctx.arc(cx + 20*s, cy - 40*s, 25*s, 0, Math.PI*2);
                 ctx.fill();
+                
+                if (d.type === 'lantern_tree') {
+                    // 红灯笼
+                    ctx.fillStyle = '#D32F2F';
+                    ctx.beginPath();
+                    ctx.arc(cx - 15*s, cy - 50*s, 8*s, 0, Math.PI*2);
+                    ctx.arc(cx + 18*s, cy - 35*s, 8*s, 0, Math.PI*2);
+                    ctx.arc(cx + 5*s, cy - 65*s, 8*s, 0, Math.PI*2);
+                    ctx.fill();
+                    // 穗子
+                    ctx.strokeStyle = '#FFD700';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(cx - 15*s, cy - 42*s); ctx.lineTo(cx - 15*s, cy - 35*s);
+                    ctx.moveTo(cx + 18*s, cy - 27*s); ctx.lineTo(cx + 18*s, cy - 20*s);
+                    ctx.stroke();
+                } else {
+                     // 旧的梅花逻辑保留
+                    ctx.fillStyle = '#F06292';
+                    ctx.beginPath();
+                    ctx.arc(cx - 20*s, cy - 50*s, 6*s, 0, Math.PI*2);
+                    ctx.fill();
+                }
+
+            } else if (d.type === 'animal') {
+                // 小动物观众
+                ctx.save();
+                
+                // 1. 确保完全不透明
+                ctx.globalAlpha = 1.0; 
+                
+                ctx.font = `${40 * s}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                
+                // 让小动物跳动
+                const jump = Math.sin(Date.now() / 150 + cx) * 5;
+                const ay = cy + 20*s - jump;
+
+                // 2. 白色轮廓/光晕 (让它们从红色背景中跳出来)
+                ctx.lineJoin = 'round';
+                ctx.miterLimit = 2;
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#fff';
+                ctx.strokeText(d.animalType || '🐼', cx, ay);
+                
+                // 3. 绘制实体 Emoji
+                ctx.fillStyle = '#000'; // 虽然Emoji自带颜色，但有些浏览器需要reset fillStyle
+                ctx.fillText(d.animalType || '🐼', cx, ay);
+                
+                ctx.restore();
+                
+            } else if (d.type === 'flag') {
+                 // 彩旗杆
+                ctx.strokeStyle = '#795548';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy + 20*s);
+                ctx.lineTo(cx, cy - 60*s);
+                ctx.stroke();
+                
+                // 彩色旗面
+                ctx.fillStyle = cx % 2 > 0 ? '#FFC107' : '#FF5722'; 
+                ctx.beginPath();
+                ctx.moveTo(cx, cy - 60*s);
+                ctx.lineTo(cx + 30*s, cy - 45*s);
+                ctx.lineTo(cx, cy - 30*s);
+                ctx.fill();
+
             } else {
-                ctx.fillStyle = d.color;
+                // 旧灯笼逻辑或其他
+                // 线
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(cx, cy, 25*s, 0, Math.PI*2);
-                ctx.arc(cx - 20*s, cy + 10*s, 20*s, 0, Math.PI*2);
-                ctx.arc(cx + 20*s, cy + 10*s, 20*s, 0, Math.PI*2);
+                ctx.moveTo(cx, cy - 50*s);
+                ctx.lineTo(cx, cy - 20*s);
+                ctx.stroke();
+                
+                // 灯笼体
+                ctx.fillStyle = '#D32F2F';
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, 25*s, 20*s, 0, 0, Math.PI*2);
                 ctx.fill();
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(cx - 10*s, cy - 20*s, 20*s, 4*s);
+                ctx.fillRect(cx - 10*s, cy + 18*s, 20*s, 4*s);
             }
         });
     }
@@ -905,52 +1153,74 @@
     function drawPlayer() {
         const x = getLaneX(gameState.playerLane);
         const y = canvas.height - 180;
-        const bounce = Math.sin(Date.now() / 150) * 5;
+        const bounce = Math.sin(Date.now() / 150) * 8; 
+        const wobble = Math.sin(Date.now() / 100) * 3; 
 
+        // 1. 影子
         ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.beginPath();
-        ctx.ellipse(x, y + 45, 28 + bounce * 0.5, 10, 0, 0, Math.PI * 2);
+        ctx.ellipse(x, y + 45, 35 - bounce, 12, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = '#FF9800'; 
+        // --- 小马绘制 (背影版 - 向前跑) ---
+        
+        // 1. 后腿 (在最下面，动态蹬地)
+        const runCycle = Math.sin(Date.now() / 80);
+        ctx.fillStyle = '#E65100'; // 深色腿
         ctx.beginPath();
-        ctx.arc(x, y - 20 + bounce, 25, Math.PI, 0); 
-        ctx.fillRect(x - 25, y - 20 + bounce, 50, 50); 
-        ctx.arc(x, y + 30 + bounce, 25, 0, Math.PI); 
+        // 左腿
+        ctx.ellipse(x - 15, y + 40 + bounce + (runCycle*8), 10, 15, 0.2, 0, Math.PI*2);
+        // 右腿
+        ctx.ellipse(x + 15, y + 40 + bounce - (runCycle*8), 10, 15, -0.2, 0, Math.PI*2);
+        ctx.fill();
+
+        // 2. 屁股/身体 (圆润的橙色)
+        ctx.fillStyle = '#FB8C00'; 
+        ctx.beginPath();
+        ctx.ellipse(x, y + 20 + bounce, 32, 28, 0, 0, Math.PI * 2); // 屁股大一点
         ctx.fill();
         
-        ctx.fillStyle = '#E53935';
+        // 3. 尾巴 (在屁股后面甩动)
+        const tailWag = Math.sin(Date.now() / 100) * 15;
+        ctx.strokeStyle = '#FDD835'; // 金色尾巴
+        ctx.lineWidth = 8;
+        ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.moveTo(x - 12, y - 10 + bounce);
-        ctx.lineTo(x + 12, y - 10 + bounce);
-        ctx.lineTo(x, y + 15 + bounce);
+        ctx.moveTo(x, y + 20 + bounce);
+        ctx.quadraticCurveTo(x + tailWag, y + 45 + bounce, x + tailWag*1.5, y + 60 + bounce);
+        ctx.stroke();
+
+        // 4. 头部 (后脑勺，比身体小，位置高)
+        ctx.fillStyle = '#FB8C00';
+        ctx.beginPath();
+        ctx.ellipse(x, y - 20 + bounce + wobble, 24, 26, 0, 0, Math.PI*2);
+        ctx.fill();
+        
+        // 5. 耳朵 (在后脑勺两侧)
+        ctx.fillStyle = '#E65100'; // 耳背深色
+        ctx.beginPath();
+        ctx.moveTo(x - 15, y - 35 + bounce);
+        ctx.lineTo(x - 25, y - 55 + bounce); // 向外指
+        ctx.lineTo(x - 8, y - 45 + bounce);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(x + 15, y - 35 + bounce);
+        ctx.lineTo(x + 25, y - 55 + bounce);
+        ctx.lineTo(x + 8, y - 45 + bounce);
         ctx.fill();
 
-        const blink = Math.sin(Date.now() / 1000) > 0.95; 
-        
-        if (blink) {
-             ctx.strokeStyle = '#333';
-             ctx.lineWidth = 2;
-             ctx.beginPath();
-             ctx.moveTo(x - 14, y - 15 + bounce);
-             ctx.lineTo(x - 6, y - 15 + bounce);
-             ctx.moveTo(x + 6, y - 15 + bounce);
-             ctx.lineTo(x + 14, y - 15 + bounce);
-             ctx.stroke();
-        } else {
-            ctx.fillStyle = 'white';
-            ctx.beginPath();
-            ctx.arc(x - 10, y - 15 + bounce, 8, 0, Math.PI * 2);
-            ctx.arc(x + 10, y - 15 + bounce, 8, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#333';
-            ctx.beginPath();
-            ctx.arc(x - 10, y - 15 + bounce, 3, 0, Math.PI * 2);
-            ctx.arc(x + 10, y - 15 + bounce, 3, 0, Math.PI * 2);
-            ctx.fill();
-        }
+        // 6. 鬃毛 (背后的毛发)
+        ctx.fillStyle = '#FDD835';
+        ctx.beginPath();
+        ctx.moveTo(x, y - 45 + bounce);
+        ctx.quadraticCurveTo(x, y - 5 + bounce, x, y + 10 + bounce); // 垂下来
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#FDD835';
+        ctx.stroke();
 
+        // 题目显示气泡 (保持在头顶)
         if (gameState.currentTask && !gameState.currentTask.processing) {
             const bubbleY = y - 90 + bounce;
             
@@ -977,16 +1247,20 @@
                 ? gameState.currentTask.meaning 
                 : gameState.currentTask.word;   
             
+            // 卡通文字效果
             if (/[a-zA-Z]/.test(text)) {
-                ctx.font = 'bold 22px "Fredoka One"';
+                ctx.font = 'bold 26px "Fredoka One"';
             } else {
-                ctx.font = 'bold 24px "Noto Sans SC"';
+                ctx.font = '900 30px "Noto Sans SC"'; 
             }
+
+            ctx.lineWidth = 5;
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#fff';
+            ctx.strokeText(text, x, bubbleY);
+
+            ctx.fillStyle = '#333';
             ctx.fillText(text, x, bubbleY);
-            
-            ctx.font = '10px "Noto Sans SC"';
-            ctx.fillStyle = '#888';
-            ctx.fillText("找对应的?", x, bubbleY + 28);
         }
     }
 
@@ -994,45 +1268,51 @@
         const x = getLaneX(item.lane);
         
         if (item.type === 'word') {
-            // 扁平化风格 (Flat Design)
-            ctx.fillStyle = item.color;
+            // 根据文字长度动态计算宽度
+            // 先设置字体以便 measureText 准确
+            if (/[a-zA-Z]/.test(item.displayText)) {
+                ctx.font = 'bold 24px "Fredoka One"';
+            } else {
+                ctx.font = 'bold 26px "Noto Sans SC"';
+            }
             
-            // 简单的圆形阴影 (底部偏移)
-            ctx.shadowColor = 'rgba(0,0,0,0.15)';
-            ctx.shadowBlur = 0;
-            ctx.shadowOffsetY = 6;
+            const textMetrics = ctx.measureText(item.displayText);
+            const textWidth = textMetrics.width;
+            const boxWidth = Math.max(100, textWidth + 50); // 最小宽度100
+            const boxHeight = 60; // 胶囊高度
+            const radius = boxHeight / 2; // 圆角半径
             
-            ctx.beginPath();
-            ctx.arc(x, item.y, 45, 0, Math.PI * 2); 
-            ctx.fill();
-            
-            ctx.shadowOffsetY = 0; // 重置
-            
-            // 内部微弱渐变，增加一点体积感但不反光
-            const grad = ctx.createLinearGradient(x, item.y - 45, x, item.y + 45);
-            grad.addColorStop(0, 'rgba(255,255,255,0.2)');
-            grad.addColorStop(1, 'rgba(0,0,0,0.1)');
-            ctx.fillStyle = grad;
-            ctx.fill();
+            // 哑光糖果质感
+            const grad = ctx.createLinearGradient(x - boxWidth/2, item.y - boxHeight/2, x + boxWidth/2, item.y + boxHeight/2);
+            grad.addColorStop(0, item.color);
+            grad.addColorStop(1, adjustColor(item.color, -20)); 
 
-            // 白色粗边框
+            ctx.fillStyle = grad;
+            ctx.shadowColor = 'rgba(0,0,0,0.2)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetY = 4;
+            
+            // 绘制胶囊体
+            ctx.beginPath();
+            ctx.roundRect(x - boxWidth/2, item.y - boxHeight/2, boxWidth, boxHeight, radius);
+            ctx.fill();
+            
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+            
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.roundRect(x - boxWidth/2, item.y - boxHeight/2, boxWidth, boxHeight, radius);
             ctx.stroke();
 
             ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
-            // 文字轻微阴影，增加可读性
             ctx.shadowColor = 'rgba(0,0,0,0.2)';
             ctx.shadowBlur = 2;
             
-            if (/[a-zA-Z]/.test(item.displayText)) {
-                ctx.font = 'bold 24px "Fredoka One"';
-            } else {
-                ctx.font = 'bold 26px "Noto Sans SC"';
-            }
             ctx.fillText(item.displayText, x, item.y);
             
             ctx.shadowBlur = 0;
@@ -1045,6 +1325,7 @@
 
     function drawCoins() {
         gameState.coins.forEach(c => {
+            // 金元宝/金币
             ctx.fillStyle = '#FFD700';
             ctx.beginPath();
             ctx.arc(c.x, c.y, 16, 0, Math.PI * 2);
@@ -1054,11 +1335,11 @@
             ctx.lineWidth = 2;
             ctx.stroke();
             
-            ctx.fillStyle = '#FFF';
+            ctx.fillStyle = '#D32F2F'; // 红色字
             ctx.font = 'bold 16px serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('$', c.x, c.y);
+            ctx.fillText('福', c.x, c.y); // 金币上写福字
         });
     }
 
@@ -1066,7 +1347,7 @@
         gameState.floatingTexts.forEach(ft => {
             ctx.globalAlpha = ft.life;
             ctx.fillStyle = ft.color;
-            ctx.font = `bold ${ft.size}px sans-serif`;
+            ctx.font = `bold ${ft.size}px "Noto Sans SC"`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.shadowColor = 'white';
@@ -1136,7 +1417,7 @@
 
     function startGame() {
         let initClouds = [];
-        for(let i=0; i<5; i++) spawnCloud();
+        for(let i=0; i<3; i++) spawnCloud(); // 1. 减少初始云朵数量 (5 -> 3)
 
         gameState = {
             isRunning: true, score: 0, lives: 3,
@@ -1148,11 +1429,17 @@
             currentStreak: 0,
             spawnCooldown: 0, history: [],
             frameCount: 0,
-            usedIndices: new Set() // 新增：记录已出过的题目索引
+            usedIndices: new Set(),
+            shake: 0 // 屏幕震动强度
         };
         
+        // 1. 预先生成路边装饰，填满屏幕
+        for(let y = 0; y < canvas.height; y += 150) {
+             if (Math.random() > 0.3) spawnDecoration(y);
+        }
+        
         if (!gameState.clouds.length) {
-             for(let i=0; i<5; i++) spawnCloud();
+             for(let i=0; i<3; i++) spawnCloud();
         }
         
         document.getElementById('start-screen').classList.add('hidden');
@@ -1167,6 +1454,25 @@
         generateNewTask();
         requestAnimationFrame(gameLoop);
     }
+    
+    // 生成爆炸粒子
+    function spawnExplosion(x, y, color) {
+        for(let i=0; i<15; i++) {
+            gameState.particles.push({
+                x: x, y: y,
+                vx: (Math.random() - 0.5) * 10,
+                vy: (Math.random() - 0.5) * 10,
+                life: 1.0,
+                color: color,
+                size: Math.random() * 5 + 3
+            });
+        }
+    }
+    
+    // 触发屏幕震动
+    function triggerShake(intensity) {
+        gameState.shake = intensity;
+    }
 
     function gameOver(win) {
         gameState.isRunning = false;
@@ -1176,7 +1482,7 @@
         endScreen.classList.remove('hidden');
         
         const title = document.getElementById('end-title');
-        title.innerText = win ? "挑战成功! 🎉" : "再接再厉! 💪";
+        title.innerText = win ? "恭喜发财! 🧨" : "再接再厉! 💪";
         
         document.getElementById('final-score').innerText = `最终得分: ${gameState.score}`;
         
