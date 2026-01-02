@@ -61,6 +61,7 @@
             font-size: 3.5rem;
             background: linear-gradient(to bottom, #FFD700, #FFA000);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0px 4px 0px #8B0000);
             margin-bottom: 0.5rem;
@@ -239,6 +240,15 @@
             font-weight: bold;
             backdrop-filter: blur(4px);
         }
+
+        #pause-btn {
+            pointer-events: auto !important; /* 覆盖父元素的 pointer-events: none */
+        }
+
+        #pause-btn:hover {
+            filter: brightness(1.15);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -261,9 +271,18 @@
 
     <!-- HUD -->
     <div id="hud" class="hidden">
-        <div class="hud-item" style="color: #D32F2F;">❤️ <span id="lives">3</span></div>
+        <div class="hud-item" style="color: #D32F2F;">❤️ <span id="lives">0</span></div>
         <div id="score-container" class="hud-item" style="color: #FF8F00;">⭐ <span id="score">0</span></div>
         <div class="hud-item" style="color: #1976D2;">🎯 <span id="progress">0/15</span></div>
+        <button id="pause-btn" class="hud-item" style="cursor: pointer; padding: 10px 20px; min-width: auto;" onclick="togglePause()">⏸️ 暂停</button>
+    </div>
+
+    <!-- 暂停界面 -->
+    <div id="pause-screen" class="overlay hidden">
+        <h1>⏸️ 游戏暂停</h1>
+        <p style="font-size: 1.2rem; margin-bottom: 30px; color: #FFF;">按空格键或点击按钮继续</p>
+        <button class="btn" onclick="togglePause()">继续游戏</button>
+        <button class="btn" onclick="endGame()" style="background: linear-gradient(to bottom, #EF5350, #C62828); margin-top: 15px;">退出游戏</button>
     </div>
 
     <!-- 结算界面 -->
@@ -288,42 +307,95 @@
      */
     const AUDIO_BASE_URL = "https://dict.youdao.com/dictvoice?type=2&audio=";
     
-    // 词库更新: 四年级上册全学期词汇 (Unit 1 - Unit 8)
+    // 词库更新: 四年级上册全学期词汇 (Unit 1 - Unit 8 + Proper Nouns + Months)
     const VOCABULARY = [
         // Unit 1
-        { word: "city", meaning: "城市" }, { word: "building", meaning: "建筑物" },
-        { word: "flat", meaning: "公寓" }, { word: "street", meaning: "街道" },
-        { word: "country", meaning: "国家" }, { word: "farm", meaning: "农场" },
-        { word: "house", meaning: "房子" }, { word: "live", meaning: "居住" },
+        { word: "city", meaning: "城市" }, { word: "building", meaning: "建筑物; 楼房" },
+        { word: "flat", meaning: "公寓" }, { word: "street", meaning: "大街; 街道" },
+        { word: "country", meaning: "乡村" }, { word: "farm", meaning: "农场" },
+        { word: "house", meaning: "房屋; 房子" }, { word: "people", meaning: "人; 人们" },
+        { word: "live", meaning: "住; 居住" }, { word: "many", meaning: "许多" },
+        { word: "place", meaning: "地方" }, { word: "quiet", meaning: "安静的" },
+        { word: "all kinds of", meaning: "各种各样的" }, { word: "a lot of", meaning: "许多" },
         // Unit 2
         { word: "eagle", meaning: "老鹰" }, { word: "owl", meaning: "猫头鹰" },
-        { word: "honeybee", meaning: "蜜蜂" }, { word: "forest", meaning: "森林" },
-        { word: "nest", meaning: "鸟巢" },
+        { word: "honeybee", meaning: "蜜蜂" }, { word: "nest", meaning: "巢穴" },
+        { word: "their", meaning: "他们的; 她们的; 它们的" }, { word: "tree hole", meaning: "树洞" },
+        { word: "safe", meaning: "安全的" }, { word: "there", meaning: "那里; 在那里" },
+        { word: "snake", meaning: "蛇" }, { word: "hive", meaning: "蜂巢" },
+        { word: "under", meaning: "在……下面; 小于; 少于" }, { word: "at night", meaning: "晚上" },
+        { word: "make honey", meaning: "酿蜜" },
         // Unit 3
-        { word: "odd", meaning: "奇数" }, { word: "even", meaning: "偶数" },
-        { word: "plus", meaning: "加" }, { word: "minus", meaning: "减" },
-        { word: "number", meaning: "数字" },
+        { word: "plus", meaning: "加; 加号" }, { word: "equal", meaning: "等于" },
+        { word: "answer", meaning: "答案; 回答" }, { word: "minus", meaning: "减; 减号" },
+        { word: "odd numbers", meaning: "奇数" }, { word: "even numbers", meaning: "偶数" },
+        { word: "use", meaning: "使用" }, { word: "help", meaning: "帮助" },
+        { word: "count", meaning: "数数" }, { word: "thing", meaning: "东西; 事物" },
+        { word: "say", meaning: "说" }, { word: "every day", meaning: "每天" },
+        { word: "how many", meaning: "多少" },
         // Unit 4
-        { word: "supermarket", meaning: "超市" }, { word: "rice", meaning: "米饭" },
-        { word: "juice", meaning: "果汁" }, { word: "biscuit", meaning: "饼干" },
+        { word: "supermarket", meaning: "超市" }, { word: "a bag of rice", meaning: "一袋米" },
+        { word: "a box of eggs", meaning: "一盒鸡蛋" }, { word: "a bottle of juice", meaning: "一瓶果汁" },
+        { word: "buy", meaning: "购买" }, { word: "sell", meaning: "出售" },
+        { word: "need", meaning: "需要" }, { word: "shopping list", meaning: "购物单" },
+        { word: "each", meaning: "每个" }, { word: "team", meaning: "队; 组" },
+        { word: "faster", meaning: "更快的" }, { word: "candy", meaning: "糖果; 巧克力" },
+        { word: "bread", meaning: "面包" }, { word: "win", meaning: "获胜" },
+        { word: "still", meaning: "还; 仍然" },
         // Unit 5
-        { word: "spring", meaning: "春天" }, { word: "summer", meaning: "夏天" },
-        { word: "autumn", meaning: "秋天" }, { word: "winter", meaning: "冬天" },
-        { word: "warm", meaning: "温暖" }, { word: "cold", meaning: "寒冷" },
+        { word: "spring", meaning: "春天" }, { word: "warm", meaning: "温暖的" },
+        { word: "summer", meaning: "夏天" }, { word: "hot", meaning: "炎热的" },
+        { word: "autumn", meaning: "秋天" }, { word: "cool", meaning: "凉爽的" },
+        { word: "winter", meaning: "冬天" }, { word: "cold", meaning: "寒冷的" },
+        { word: "parent", meaning: "父亲(或母亲)" }, { word: "season", meaning: "季节" },
+        { word: "year", meaning: "年" }, { word: "grow", meaning: "(使)生长" },
+        { word: "get", meaning: "变得" }, { word: "usually", meaning: "通常" },
+        { word: "after", meaning: "在……之后" }, { word: "fall", meaning: "落下" },
+        { word: "turn", meaning: "(使)变成" }, { word: "often", meaning: "经常" },
+        { word: "snow", meaning: "下雪; 雪" }, { word: "then", meaning: "然后" },
+        { word: "begin", meaning: "开始" },
         // Unit 6
-        { word: "plant", meaning: "植物" }, { word: "flower", meaning: "花" },
-        { word: "fruit", meaning: "水果" }, { word: "seed", meaning: "种子" },
+        { word: "flower", meaning: "花" }, { word: "fruit", meaning: "果实; 水果" },
+        { word: "leaf", meaning: "叶子" }, { word: "soil", meaning: "土壤" },
+        { word: "sunflower", meaning: "向日葵" }, { word: "seed", meaning: "种子" },
+        { word: "put", meaning: "放" }, { word: "plant", meaning: "植物" },
+        { word: "root", meaning: "根" }, { word: "tall", meaning: "高的" },
+        { word: "round", meaning: "圆形的" }, { word: "oil", meaning: "食用油" },
+        { word: "amazing", meaning: "令人惊叹的" },
         // Unit 7
-        { word: "traffic", meaning: "交通" }, { word: "light", meaning: "灯" },
-        { word: "wait", meaning: "等待" }, { word: "stop", meaning: "停止" },
+        { word: "green light", meaning: "绿灯" }, { word: "red light", meaning: "红灯" },
+        { word: "wait", meaning: "等待" }, { word: "cross", meaning: "穿越" },
+        { word: "Mr", meaning: "先生" }, { word: "way", meaning: "路线; 道路" },
+        { word: "road", meaning: "路; 马路" }, { word: "should", meaning: "应该" },
+        { word: "first", meaning: "首先" }, { word: "left", meaning: "左边" },
+        { word: "car", meaning: "小汽车" }, { word: "right", meaning: "右边" },
+        { word: "skate", meaning: "滑(滑板)" }, { word: "sorry", meaning: "对不起" },
+        { word: "kid", meaning: "小孩; 孩子" }, { word: "late", meaning: "迟到" },
+        { word: "Good job!", meaning: "做得好!" }, { word: "Hurry up!", meaning: "快点!" },
         // Unit 8
-        { word: "busy", meaning: "忙碌" }, { word: "cook", meaning: "做饭" },
-        { word: "wash", meaning: "洗" }
+        { word: "go shopping", meaning: "购物" }, { word: "go for a walk", meaning: "去散步" },
+        { word: "use the internet", meaning: "使用互联网" }, { word: "do exercise", meaning: "锻炼" },
+        { word: "do housework", meaning: "做家务" }, { word: "do gardening", meaning: "做园艺" },
+        { word: "grandparent", meaning: "祖父(母); 外祖父(母)" }, { word: "week", meaning: "星期; 周" },
+        { word: "work", meaning: "工作" }, { word: "always", meaning: "总是" },
+        { word: "vlog", meaning: "视频博客" }, { word: "watch", meaning: "看; 观看" },
+        { word: "do tai chi", meaning: "打太极拳" }, { word: "tidy up", meaning: "收拾; 整理" },
+        // Proper nouns
+        { word: "Shenzhen", meaning: "深圳" }, { word: "Star Village", meaning: "星星村" },
+        { word: "Green Farm", meaning: "绿色农场" }, { word: "New York", meaning: "纽约市" },
+        { word: "Singapore", meaning: "新加坡市" }, { word: "the Double Ninth Festival", meaning: "重阳节" },
+        // Months
+        { word: "January", meaning: "一月" }, { word: "February", meaning: "二月" },
+        { word: "March", meaning: "三月" }, { word: "April", meaning: "四月" },
+        { word: "May", meaning: "五月" }, { word: "June", meaning: "六月" },
+        { word: "July", meaning: "七月" }, { word: "August", meaning: "八月" },
+        { word: "September", meaning: "九月" }, { word: "October", meaning: "十月" },
+        { word: "November", meaning: "十一月" }, { word: "December", meaning: "十二月" }
     ];
 
     const GAME_SPEED_INITIAL = 0.52; // 提速 50% (0.35 * 1.5)
     const SPEED_INCREMENT = 0.02; 
-    const TOTAL_QUESTIONS = VOCABULARY.length;
+    // const TOTAL_QUESTIONS = VOCABULARY.length; // 移除全局常量，改为动态生成
 
     // 新年配色泡泡 -> 升级为高饱和度糖果色
     const BUBBLE_COLORS = [
@@ -349,6 +421,7 @@
     
     let gameState = {
         isRunning: false,
+        isPaused: false,
         score: 0,
         lives: 3,
         speed: GAME_SPEED_INITIAL,
@@ -439,14 +512,15 @@
      * 核心逻辑
      */
     function generateNewTask() {
-        if (gameState.questionsAnswered >= TOTAL_QUESTIONS) {
+        if (gameState.questionsAnswered >= gameState.totalQuestions) {
             gameOver(true);
             return;
         }
 
         let availableIndices = [];
         if (!gameState.usedIndices) gameState.usedIndices = new Set();
-        for(let i=0; i<VOCABULARY.length; i++) {
+        // 使用 gameVocabulary 的长度
+        for(let i=0; i<gameState.gameVocabulary.length; i++) {
             if(!gameState.usedIndices.has(i)) availableIndices.push(i);
         }
         
@@ -456,10 +530,10 @@
             targetIndex = availableIndices[randomIndex];
             gameState.usedIndices.add(targetIndex);
         } else {
-            targetIndex = Math.floor(Math.random() * VOCABULARY.length);
+            targetIndex = Math.floor(Math.random() * gameState.gameVocabulary.length);
         }
 
-        const targetWord = VOCABULARY[targetIndex];
+        const targetWord = gameState.gameVocabulary[targetIndex];
         const mode = Math.random() > 0.5 ? 'CN_to_EN' : 'EN_to_CN';
         
         gameState.currentTask = {
@@ -619,7 +693,14 @@
     }
 
     function gameLoop(timestamp) {
-        if (!gameState.isRunning) return;
+        if (!gameState.isRunning || gameState.isPaused) {
+            if (gameState.isRunning && gameState.isPaused) {
+                // 暂停时只绘制画面，不更新逻辑
+                draw();
+            }
+            requestAnimationFrame(gameLoop);
+            return;
+        }
 
         const deltaTime = timestamp - lastTime;
         lastTime = timestamp;
@@ -772,7 +853,7 @@
         gameState.questionsAnswered++;
         gameState.currentStreak++; 
         
-        document.getElementById('progress').innerText = `${gameState.questionsAnswered}/${TOTAL_QUESTIONS}`;
+        document.getElementById('progress').innerText = `${gameState.questionsAnswered}/${gameState.totalQuestions}`;
 
         gameState.history.push({
             word: gameState.currentTask.word, 
@@ -823,7 +904,7 @@
         });
         
         gameState.questionsAnswered++;
-        document.getElementById('progress').innerText = `${gameState.questionsAnswered}/${TOTAL_QUESTIONS}`;
+        document.getElementById('progress').innerText = `${gameState.questionsAnswered}/${gameState.totalQuestions}`;
         finishCurrentTask(60);
     }
     
@@ -1392,7 +1473,7 @@
 
     // 控制
     function movePlayer(direction) {
-        if (!gameState.isRunning) return;
+        if (!gameState.isRunning || gameState.isPaused) return;
         if (direction === 'left' && gameState.playerLane > 0) gameState.playerLane--;
         else if (direction === 'right' && gameState.playerLane < 2) gameState.playerLane++;
     }
@@ -1400,13 +1481,17 @@
     window.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') movePlayer('left');
         if (e.key === 'ArrowRight') movePlayer('right');
+        if (e.key === ' ') {
+            e.preventDefault(); // 防止页面滚动
+            if (gameState.isRunning) togglePause();
+        }
     });
 
     canvas.addEventListener('mousedown', handleInput);
     canvas.addEventListener('touchstart', handleInput, {passive: false});
 
     function handleInput(e) {
-        if (!gameState.isRunning) return;
+        if (!gameState.isRunning || gameState.isPaused) return;
         if (e.target.closest('#task-box')) return;
         if(e.type === 'touchstart') e.preventDefault();
         
@@ -1419,6 +1504,11 @@
         let initClouds = [];
         for(let i=0; i<3; i++) spawnCloud(); // 1. 减少初始云朵数量 (5 -> 3)
 
+        // 随机抽取60个单词作为本局词库
+        const shuffled = [...VOCABULARY].sort(() => 0.5 - Math.random());
+        const selectedVocabulary = shuffled.slice(0, 60);
+        const totalQs = selectedVocabulary.length;
+
         gameState = {
             isRunning: true, score: 0, lives: 3,
             speed: GAME_SPEED_INITIAL, playerLane: 1,
@@ -1430,7 +1520,10 @@
             spawnCooldown: 0, history: [],
             frameCount: 0,
             usedIndices: new Set(),
-            shake: 0 // 屏幕震动强度
+            shake: 0, // 屏幕震动强度
+            gameVocabulary: selectedVocabulary, // 本局词库
+            totalQuestions: totalQs, // 本局总题数
+            isPaused: false // 初始化暂停状态
         };
         
         // 1. 预先生成路边装饰，填满屏幕
@@ -1444,9 +1537,11 @@
         
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('game-over-screen').classList.add('hidden');
+        document.getElementById('pause-screen').classList.add('hidden');
         document.getElementById('hud').classList.remove('hidden');
         document.getElementById('score').innerText = '0';
-        document.getElementById('progress').innerText = '0/' + TOTAL_QUESTIONS;
+        document.getElementById('lives').innerText = gameState.lives; // 修复生命值显示
+        document.getElementById('progress').innerText = '0/' + gameState.totalQuestions;
         
         if (audioCtx.state === 'suspended') audioCtx.resume();
 
@@ -1474,8 +1569,36 @@
         gameState.shake = intensity;
     }
 
+    // 暂停/恢复游戏
+    function togglePause() {
+        if (!gameState.isRunning) return;
+        
+        gameState.isPaused = !gameState.isPaused;
+        const pauseScreen = document.getElementById('pause-screen');
+        const pauseBtn = document.getElementById('pause-btn');
+        
+        if (gameState.isPaused) {
+            pauseScreen.classList.remove('hidden');
+            pauseBtn.innerText = '▶️ 继续';
+        } else {
+            pauseScreen.classList.add('hidden');
+            pauseBtn.innerText = '⏸️ 暂停';
+            lastTime = performance.now(); // 重置时间，避免暂停后deltaTime过大
+        }
+    }
+
+    // 结束游戏（从暂停界面退出）
+    function endGame() {
+        gameState.isRunning = false;
+        gameState.isPaused = false;
+        document.getElementById('pause-screen').classList.add('hidden');
+        document.getElementById('hud').classList.add('hidden');
+        document.getElementById('start-screen').classList.remove('hidden');
+    }
+
     function gameOver(win) {
         gameState.isRunning = false;
+        gameState.isPaused = false;
         document.getElementById('hud').classList.add('hidden');
         
         const endScreen = document.getElementById('game-over-screen');
@@ -1487,8 +1610,8 @@
         document.getElementById('final-score').innerText = `最终得分: ${gameState.score}`;
         
         const stars = document.getElementById('star-rating');
-        if (gameState.score >= TOTAL_QUESTIONS * 100) stars.innerText = "⭐⭐⭐";
-        else if (gameState.score >= TOTAL_QUESTIONS * 60) stars.innerText = "⭐⭐";
+        if (gameState.score >= gameState.totalQuestions * 100) stars.innerText = "⭐⭐⭐";
+        else if (gameState.score >= gameState.totalQuestions * 60) stars.innerText = "⭐⭐";
         else stars.innerText = "⭐";
         
         const list = document.getElementById('word-review-list');
